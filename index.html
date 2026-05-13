@@ -210,6 +210,16 @@ canvas{width:100%!important;height:100%!important}
 <!-- 統計ページ -->
 <div id="page-stats" class="page">
   <div class="card">
+    <div class="card-title">今週のサマリー <span id="week-range" style="font-size:12px;color:var(--text-light);font-weight:400"></span></div>
+    <div class="stat-grid">
+      <div><div class="stat-value" id="week-days">0</div><div class="stat-label">トレーニング日数</div></div>
+      <div><div class="stat-value" id="week-sets">0</div><div class="stat-label">総セット数</div></div>
+      <div><div class="stat-value" id="week-volume">0</div><div class="stat-label">総ボリューム(kg)</div></div>
+      <div><div class="stat-value" id="week-cardio">0</div><div class="stat-label">有酸素(分)</div></div>
+    </div>
+    <div id="week-parts" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px"></div>
+  </div>
+  <div class="card">
     <div class="card-title">今月のサマリー</div>
     <div class="stat-grid">
       <div><div class="stat-value" id="stat-days">0</div><div class="stat-label">トレーニング日数</div></div>
@@ -959,6 +969,42 @@ function renderStats() {
   });
   var weekKeys = Object.keys(weeks).sort().slice(-8);
   drawBarChart('weekly-chart', weekKeys.map(function(k) { return {label: k.slice(5), value: weeks[k]}; }));
+
+  // 今週のサマリー
+  var today = new Date();
+  var dayOfWeek = today.getDay();
+  var mon = new Date(today);
+  mon.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
+  var sun = new Date(mon);
+  sun.setDate(mon.getDate() + 6);
+  var monStr = fmt(mon);
+  var sunStr = fmt(sun);
+  document.getElementById('week-range').textContent = monStr.slice(5) + ' 〜 ' + sunStr.slice(5);
+
+  var weekRecs = state.records.filter(function(r) { return r.date >= monStr && r.date <= sunStr; });
+  var wDays = {};
+  var wSets = 0;
+  var wVol = 0;
+  var wCardio = 0;
+  var wParts = {};
+  weekRecs.forEach(function(r) {
+    wDays[r.date] = true;
+    wSets += r.sets.length;
+    if (r.part === '有酸素') {
+      r.sets.forEach(function(s) { wCardio += (s.weight || 0); });
+    } else {
+      r.sets.forEach(function(s) { wVol += s.weight * s.reps; });
+    }
+    wParts[r.part] = true;
+  });
+  document.getElementById('week-days').textContent = Object.keys(wDays).length;
+  document.getElementById('week-sets').textContent = wSets;
+  document.getElementById('week-volume').textContent = wVol >= 1000 ? (wVol/1000).toFixed(1)+'k' : wVol;
+  document.getElementById('week-cardio').textContent = wCardio;
+  var wpEl = document.getElementById('week-parts');
+  wpEl.innerHTML = Object.keys(wParts).map(function(p) {
+    return '<span class="tag" style="background:var(--primary);color:#fff;font-size:11px">' + p + '</span>';
+  }).join('');
 }
 
 // === 設定ページ ===

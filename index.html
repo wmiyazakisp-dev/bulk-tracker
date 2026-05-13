@@ -88,6 +88,11 @@ canvas{width:100%!important;height:100%!important}
 .cal-streak-item{text-align:center}
 .cal-streak-num{font-size:22px;font-weight:800;color:var(--primary)}
 .cal-streak-label{font-size:11px;color:var(--text-light)}
+.last-menu-item{padding:10px 12px;margin-bottom:6px;background:var(--bg);border-radius:10px;cursor:pointer;transition:.15s}
+.last-menu-item:active{transform:scale(.98);opacity:.8}
+.last-menu-item .lm-name{font-size:14px;font-weight:600}
+.last-menu-item .lm-detail{font-size:12px;color:var(--text-light);margin-top:2px}
+.last-menu-item .lm-date{font-size:11px;color:var(--text-light);float:right}
 @keyframes fadeout{0%{opacity:1}70%{opacity:1}100%{opacity:0}}
 </style>
 </head>
@@ -109,6 +114,11 @@ canvas{width:100%!important;height:100%!important}
     <div class="card-title">部位を選択</div>
     <div class="chip-group" id="part-chips"></div>
   </div>
+  <div class="card" id="last-menu-card" style="display:none">
+    <div class="card-title">前回のメニュー <span id="last-menu-part" style="font-size:12px;color:var(--text-light)"></span></div>
+    <div id="last-menu-list"></div>
+  </div>
+
   <div class="card">
     <div class="card-title">種目</div>
     <div class="form-group">
@@ -365,6 +375,58 @@ function selectPart(p) {
   selectedPart = (selectedPart === p) ? null : p;
   renderPartChips();
   updateExerciseList();
+  renderLastMenu();
+}
+
+function renderLastMenu() {
+  var card = document.getElementById('last-menu-card');
+  var list = document.getElementById('last-menu-list');
+  var partLabel = document.getElementById('last-menu-part');
+
+  if (!selectedPart) {
+    card.style.display = 'none';
+    return;
+  }
+
+  var partRecs = state.records.filter(function(r) { return r.part === selectedPart; });
+  if (partRecs.length === 0) {
+    card.style.display = 'none';
+    return;
+  }
+
+  var latestDate = '';
+  partRecs.forEach(function(r) { if (r.date > latestDate) latestDate = r.date; });
+  var lastSession = partRecs.filter(function(r) { return r.date === latestDate; });
+
+  var d = new Date(latestDate + 'T00:00:00');
+  var wNames = ['日','月','火','水','木','金','土'];
+  var dateLabel = (d.getMonth()+1) + '/' + d.getDate() + '(' + wNames[d.getDay()] + ')';
+
+  partLabel.textContent = dateLabel;
+  card.style.display = '';
+
+  list.innerHTML = lastSession.map(function(r) {
+    var setsText = r.sets.map(function(s, i) { return (i+1) + 'set: ' + s.weight + 'kg×' + s.reps + '回'; }).join('  ');
+    var setsJson = JSON.stringify(r.sets).replace(/'/g, "\\'");
+    return '<div class="last-menu-item" onclick="applyLastMenu(\'' + r.exercise.replace(/'/g, "\\'") + '\', \'' + setsJson + '\')">' +
+      '<div class="lm-name">' + r.exercise + '</div>' +
+      '<div class="lm-detail">' + setsText + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function applyLastMenu(exercise, setsJson) {
+  var sets = JSON.parse(setsJson);
+  document.getElementById('exercise-name').value = exercise;
+  setCount = sets.length;
+  renderSets();
+  for (var i = 0; i < sets.length; i++) {
+    document.getElementById('weight-' + (i+1)).value = sets[i].weight || '';
+    document.getElementById('reps-' + (i+1)).value = sets[i].reps || '';
+  }
+
+  var el = document.getElementById('exercise-name');
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function updateExerciseList() {

@@ -88,6 +88,11 @@ canvas{width:100%!important;height:100%!important}
 .cal-streak-item{text-align:center}
 .cal-streak-num{font-size:22px;font-weight:800;color:var(--primary)}
 .cal-streak-label{font-size:11px;color:var(--text-light)}
+.suggestions{background:var(--card);border:1.5px solid var(--border);border-radius:10px;margin-top:4px;max-height:200px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.suggestion-item{padding:11px 14px;font-size:14px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.suggestion-item:last-child{border-bottom:none}
+.suggestion-item:active{background:var(--bg)}
+.suggestion-item .sg-part{font-size:11px;color:var(--text-light)}
 .last-menu-item{padding:10px 12px;margin-bottom:6px;background:var(--bg);border-radius:10px;cursor:pointer;transition:.15s}
 .last-menu-item:active{transform:scale(.98);opacity:.8}
 .last-menu-item .lm-name{font-size:14px;font-weight:600}
@@ -121,9 +126,9 @@ canvas{width:100%!important;height:100%!important}
 
   <div class="card">
     <div class="card-title">種目</div>
-    <div class="form-group">
-      <input type="text" id="exercise-name" placeholder="種目名を入力" list="exercise-list" autocomplete="off">
-      <datalist id="exercise-list"></datalist>
+    <div class="form-group" style="position:relative">
+      <input type="text" id="exercise-name" placeholder="種目名を入力 or 下から選択" autocomplete="off" onfocus="showSuggestions()" oninput="showSuggestions()">
+      <div id="exercise-suggestions" style="display:none"></div>
     </div>
     <div id="sets-container"></div>
     <button class="btn btn-secondary btn-sm" onclick="addSet()" style="margin-top:8px">+ セット追加</button>
@@ -429,11 +434,67 @@ function applyLastMenu(exercise, setsJson) {
   el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-function updateExerciseList() {
-  var dl = document.getElementById('exercise-list');
+function updateExerciseList() {}
+
+function showSuggestions() {
+  var container = document.getElementById('exercise-suggestions');
+  var input = document.getElementById('exercise-name').value.trim().toLowerCase();
   var filtered = selectedPart ? state.exercises.filter(function(e) { return e.part === selectedPart; }) : state.exercises;
-  dl.innerHTML = filtered.map(function(e) { return '<option value="' + e.name + '">'; }).join('');
+
+  if (input) {
+    filtered = filtered.filter(function(e) { return e.name.toLowerCase().indexOf(input) >= 0; });
+  }
+
+  if (filtered.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+
+  container.className = 'suggestions';
+  container.style.display = '';
+  container.innerHTML = filtered.map(function(e) {
+    return '<div class="suggestion-item" onclick="pickExercise(\'' + e.name.replace(/'/g, "\\'") + '\')">' +
+      '<span>' + e.name + '</span><span class="sg-part">' + e.part + '</span></div>';
+  }).join('');
 }
+
+function pickExercise(name) {
+  document.getElementById('exercise-name').value = name;
+  document.getElementById('exercise-suggestions').style.display = 'none';
+
+  var ex = state.exercises.find(function(e) { return e.name === name; });
+  if (ex && !selectedPart) {
+    selectedPart = ex.part;
+    renderPartChips();
+  }
+
+  var lastRec = null;
+  for (var i = state.records.length - 1; i >= 0; i--) {
+    if (state.records[i].exercise === name) { lastRec = state.records[i]; break; }
+  }
+  if (lastRec) {
+    setCount = lastRec.sets.length;
+    renderSets();
+    for (var j = 0; j < lastRec.sets.length; j++) {
+      document.getElementById('weight-' + (j+1)).value = lastRec.sets[j].weight || '';
+      document.getElementById('reps-' + (j+1)).value = lastRec.sets[j].reps || '';
+    }
+  }
+}
+
+function hideSuggestions(e) {
+  setTimeout(function() {
+    var container = document.getElementById('exercise-suggestions');
+    if (container) container.style.display = 'none';
+  }, 200);
+}
+document.addEventListener('click', function(e) {
+  var input = document.getElementById('exercise-name');
+  var container = document.getElementById('exercise-suggestions');
+  if (input && container && !input.contains(e.target) && !container.contains(e.target)) {
+    container.style.display = 'none';
+  }
+});
 
 function addSet() {
   setCount++;

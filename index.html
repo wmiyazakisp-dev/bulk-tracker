@@ -498,7 +498,13 @@ document.addEventListener('click', function(e) {
 
 function addSet() {
   setCount++;
-  renderSets();
+  var c = document.getElementById('sets-container');
+  c.insertAdjacentHTML('beforeend',
+    '<div class="set-row">' +
+    '<span class="set-label">' + setCount + 'セット</span>' +
+    '<input type="number" id="weight-' + setCount + '" placeholder="重量kg" step="0.5" inputmode="decimal">' +
+    '<input type="number" id="reps-' + setCount + '" placeholder="回数" inputmode="numeric">' +
+    '</div>');
 }
 
 function renderSets() {

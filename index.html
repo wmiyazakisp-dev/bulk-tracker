@@ -131,7 +131,7 @@ canvas{width:100%!important;height:100%!important}
       <div id="exercise-suggestions" style="display:none"></div>
     </div>
     <div id="sets-container"></div>
-    <button class="btn btn-secondary btn-sm" onclick="addSet()" style="margin-top:8px">+ セット追加</button>
+    <button class="btn btn-secondary btn-sm" id="add-set-btn" onclick="addSet()" style="margin-top:8px">+ セット追加</button>
   </div>
   <div class="card">
     <div class="card-title">メモ・写真</div>
@@ -336,6 +336,17 @@ function fmtDisplay(d) {
 
 function escHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
+function formatSets(r) {
+  if (r.sets.length > 0 && r.sets[0].unit === 'cardio') {
+    var s = r.sets[0];
+    var parts = [];
+    if (s.reps) parts.push(s.reps + '分');
+    if (s.weight) parts.push(s.weight + 'km');
+    return parts.join(' / ') || '-';
+  }
+  return r.sets.map(function(s, i) { return (i+1) + 'set: ' + s.weight + 'kg × ' + s.reps + '回'; }).join(' / ');
+}
+
 // ページ切替
 function switchPage(name) {
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
@@ -382,6 +393,7 @@ function selectPart(p) {
   renderPartChips();
   updateExerciseList();
   renderLastMenu();
+  renderSets();
 }
 
 function renderLastMenu() {
@@ -412,7 +424,7 @@ function renderLastMenu() {
   card.style.display = '';
 
   list.innerHTML = lastSession.map(function(r) {
-    var setsText = r.sets.map(function(s, i) { return (i+1) + 'set: ' + s.weight + 'kg×' + s.reps + '回'; }).join('  ');
+    var setsText = formatSets(r);
     var setsJson = JSON.stringify(r.sets).replace(/'/g, "\\'");
     return '<div class="last-menu-item" onclick="applyLastMenu(\'' + r.exercise.replace(/'/g, "\\'") + '\', \'' + setsJson + '\')">' +
       '<div class="lm-name">' + r.exercise + '</div>' +
@@ -497,7 +509,12 @@ document.addEventListener('click', function(e) {
   }
 });
 
+function isCardio() {
+  return selectedPart === '有酸素';
+}
+
 function addSet() {
+  if (isCardio()) return;
   setCount++;
   var c = document.getElementById('sets-container');
   c.insertAdjacentHTML('beforeend',
@@ -510,6 +527,24 @@ function addSet() {
 
 function renderSets() {
   var c = document.getElementById('sets-container');
+  var addBtn = document.getElementById('add-set-btn');
+
+  if (isCardio()) {
+    c.innerHTML = '<div class="set-row">' +
+      '<span class="set-label">時間</span>' +
+      '<input type="number" id="cardio-min" placeholder="分" step="1" inputmode="numeric">' +
+      '<span style="font-size:14px;color:var(--text-light);min-width:20px">分</span>' +
+      '</div>' +
+      '<div class="set-row">' +
+      '<span class="set-label">距離</span>' +
+      '<input type="number" id="cardio-km" placeholder="km" step="0.1" inputmode="decimal">' +
+      '<span style="font-size:14px;color:var(--text-light);min-width:20px">km</span>' +
+      '</div>';
+    if (addBtn) addBtn.style.display = 'none';
+    return;
+  }
+
+  if (addBtn) addBtn.style.display = '';
   var html = '';
   for (var i = 1; i <= setCount; i++) {
     html += '<div class="set-row">' +
@@ -550,12 +585,19 @@ function saveRecord() {
   if (!name) { alert('種目名を入力してください'); return; }
 
   var sets = [];
-  for (var i = 1; i <= setCount; i++) {
-    var w = parseFloat(document.getElementById('weight-' + i).value) || 0;
-    var r = parseInt(document.getElementById('reps-' + i).value) || 0;
-    if (w > 0 || r > 0) sets.push({ weight: w, reps: r });
+  if (isCardio()) {
+    var mins = parseFloat(document.getElementById('cardio-min').value) || 0;
+    var km = parseFloat(document.getElementById('cardio-km').value) || 0;
+    if (mins === 0 && km === 0) { alert('時間または距離を入力してください'); return; }
+    sets.push({ weight: km, reps: mins, unit: 'cardio' });
+  } else {
+    for (var i = 1; i <= setCount; i++) {
+      var w = parseFloat(document.getElementById('weight-' + i).value) || 0;
+      var r = parseInt(document.getElementById('reps-' + i).value) || 0;
+      if (w > 0 || r > 0) sets.push({ weight: w, reps: r });
+    }
+    if (sets.length === 0) { alert('少なくとも1セット入力してください'); return; }
   }
-  if (sets.length === 0) { alert('少なくとも1セット入力してください'); return; }
 
   var part = selectedPart || (state.exercises.find(function(e) { return e.name === name; }) || {}).part || '未分類';
   var memo = document.getElementById('record-memo').value.trim();
@@ -608,7 +650,7 @@ function renderTodayRecords() {
   }
 
   c.innerHTML = recs.map(function(r) {
-    var setsText = r.sets.map(function(s, i) { return (i+1) + 'set: ' + s.weight + 'kg × ' + s.reps + '回'; }).join(' / ');
+    var setsText = formatSets(r);
     var memoHtml = r.memo ? '<div class="record-memo">' + escHtml(r.memo) + '</div>' : '';
     var photoHtml = (r.photos || []).map(function(p) { return '<img src="' + p + '" class="record-photo">'; }).join('');
     return '<div class="record-item">' +
@@ -739,7 +781,7 @@ function renderCalDetail(dateStr) {
   });
 
   var recsHtml = recs.map(function(r) {
-    var setsText = r.sets.map(function(s, i) { return (i+1) + 'set: ' + s.weight + 'kg×' + s.reps + '回'; }).join(' / ');
+    var setsText = formatSets(r);
     var memoHtml = r.memo ? '<div class="record-memo">' + escHtml(r.memo) + '</div>' : '';
     return '<div class="record-item">' +
       '<span class="tag tag-custom">' + r.part + '</span>' +
@@ -868,7 +910,7 @@ function showFilteredHistory(part) {
 
   c.innerHTML = dates.slice(0, 30).map(function(date) {
     var items = grouped[date].map(function(r) {
-      var setsText = r.sets.map(function(s, i) { return (i+1) + 'set: ' + s.weight + 'kg×' + s.reps + '回'; }).join(' / ');
+      var setsText = formatSets(r);
       var memoHtml = r.memo ? '<div class="record-memo">' + escHtml(r.memo) + '</div>' : '';
       return '<div class="record-item"><span class="tag tag-custom">' + r.part + '</span><span class="record-exercise">' + r.exercise + '</span>' +
         '<div class="record-detail">' + setsText + '</div>' + memoHtml + '</div>';

@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Bulk Tracker</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#e85d3a;--primary-dark:#d14b2a;--accent:#f7a63b;--pink:#e8607a;--bg:#dfe8f0;--card:rgba(255,255,255,.85);--text:#2d2a3e;--text-light:#7a7590;--border:rgba(200,195,215,.4);--success:#e85d3a;--danger:#d44060;--warning:#f7a63b}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;-webkit-tap-highlight-color:transparent}
+body::before{content:'';position:fixed;top:-20%;left:50%;transform:translateX(-50%);width:140vw;height:70vh;background:radial-gradient(ellipse at center,#f5d76e 0%,#f0a03a 20%,#e8607a 45%,#d44060 60%,rgba(223,232,240,0) 75%);z-index:-1;pointer-events:none;opacity:.35}
+.header{background:linear-gradient(135deg,#e85d3a,#f0a03a,#f5d76e);color:#fff;padding:16px 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:18px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.12)}
+.header-btn{background:rgba(255,255,255,.25);border:none;color:#fff;padding:6px 12px;border-radius:8px;font-size:13px;cursor:pointer;backdrop-filter:blur(4px)}
+.tab-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.92);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);backdrop-filter:blur(12px)}
+.tab-bar button{flex:1;border:none;background:none;padding:10px 0 8px;font-size:10px;color:var(--text-light);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tab-bar button.active{color:var(--primary)}
+.tab-bar button svg{width:22px;height:22px}
+.page{display:none;padding:16px}
+.page.active{display:block}
+.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(200,120,80,.08);backdrop-filter:blur(8px)}
+.card-title{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:var(--text-light);margin-bottom:5px}
+input,select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;background:var(--bg);color:var(--text);-webkit-appearance:none;font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(232,93,58,.15)}
+textarea{resize:vertical;min-height:60px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 20px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;width:100%;font-family:inherit}
+.btn-primary{background:linear-gradient(135deg,#e85d3a,#f0a03a);color:#fff;box-shadow:0 2px 8px rgba(232,93,58,.25)}
+.btn-primary:active{background:linear-gradient(135deg,#d14b2a,#e09030)}
+.btn-secondary{background:var(--bg);color:var(--text);border:1.5px solid var(--border)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-sm{padding:8px 14px;font-size:13px;width:auto}
+.btn-group{display:flex;gap:8px}
+.chip-group{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;border:1.5px solid var(--border);background:var(--card);cursor:pointer;transition:.15s}
+.chip.active{background:linear-gradient(135deg,#e85d3a,#f0a03a);color:#fff;border-color:transparent;box-shadow:0 2px 6px rgba(232,93,58,.2)}
+.set-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.set-row input{flex:1}
+.set-label{font-size:13px;font-weight:600;color:var(--text-light);min-width:50px;text-align:center}
+.record-item{padding:14px 0;border-bottom:1px solid var(--border)}
+.record-item:last-child{border-bottom:none}
+.record-date{font-size:13px;color:var(--text-light);margin-bottom:4px}
+.record-exercise{font-size:15px;font-weight:600}
+.record-detail{font-size:13px;color:var(--text-light);margin-top:2px}
+.record-memo{font-size:13px;color:var(--text);margin-top:6px;padding:8px;background:var(--bg);border-radius:8px}
+.record-photo{width:100%;max-width:200px;border-radius:8px;margin-top:8px}
+.stat-value{font-size:28px;font-weight:800;color:var(--primary)}
+.stat-label{font-size:12px;color:var(--text-light);margin-top:2px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.empty{text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px}
+.delete-btn{background:none;border:none;color:var(--danger);font-size:18px;cursor:pointer;padding:4px 8px}
+.tag{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;margin-right:4px}
+.tag-custom{background:rgba(232,93,58,.12);color:#d14b2a}
+.photo-input-wrap{position:relative}
+.photo-input-wrap input[type=file]{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer}
+.photo-preview{width:60px;height:60px;border-radius:8px;object-fit:cover;margin-right:8px}
+.chart-container{width:100%;height:200px;position:relative}
+canvas{width:100%!important;height:100%!important}
+.filter-row{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.filter-row::-webkit-scrollbar{display:none}
+.body-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.body-row input{flex:1}
+.body-row .body-label{font-size:13px;min-width:70px;color:var(--text-light);font-weight:600}
+.date-nav{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px}
+.date-nav button{background:none;border:none;font-size:20px;color:var(--primary);cursor:pointer;padding:4px 10px}
+.date-nav span{font-size:15px;font-weight:600}
+/* カレンダー */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-header button{background:none;border:none;font-size:20px;color:var(--primary);cursor:pointer;padding:4px 12px}
+.cal-header span{font-size:16px;font-weight:700}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.cal-dow{font-size:11px;font-weight:600;color:var(--text-light);padding:6px 0}
+.cal-day{position:relative;padding:8px 0;border-radius:10px;font-size:14px;cursor:pointer;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:.15s}
+.cal-day:active{background:var(--bg)}
+.cal-day.today{font-weight:800;color:var(--primary)}
+.cal-day.selected{background:var(--primary);color:#fff;border-radius:10px}
+.cal-day.selected .cal-dots span{background:#fff}
+.cal-day.other-month{color:#cbd5e1}
+.cal-dots{display:flex;gap:2px;justify-content:center;min-height:6px}
+.cal-dots span{width:5px;height:5px;border-radius:50%}
+.cal-detail{margin-top:16px}
+.cal-detail-header{font-size:14px;font-weight:700;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.cal-streak{display:flex;gap:16px;justify-content:center;padding:4px 0}
+.cal-streak-item{text-align:center}
+.cal-streak-num{font-size:22px;font-weight:800;color:var(--primary)}
+.cal-streak-label{font-size:11px;color:var(--text-light)}
+@keyframes fadeout{0%{opacity:1}70%{opacity:1}100%{opacity:0}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Bulk Tracker</h1>
+  <button class="header-btn" onclick="exportData()">データ出力</button>
+</div>
+
+<!-- 記録ページ -->
+<div id="page-record" class="page active">
+  <div class="date-nav">
+    <button onclick="changeDate(-1)">&lt;</button>
+    <span id="current-date"></span>
+    <button onclick="changeDate(1)">&gt;</button>
+  </div>
+  <div class="card">
+    <div class="card-title">部位を選択</div>
+    <div class="chip-group" id="part-chips"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">種目</div>
+    <div class="form-group">
+      <input type="text" id="exercise-name" placeholder="種目名を入力" list="exercise-list" autocomplete="off">
+      <datalist id="exercise-list"></datalist>
+    </div>
+    <div id="sets-container"></div>
+    <button class="btn btn-secondary btn-sm" onclick="addSet()" style="margin-top:8px">+ セット追加</button>
+  </div>
+  <div class="card">
+    <div class="card-title">メモ・写真</div>
+    <div class="form-group">
+      <textarea id="record-memo" placeholder="メモ（任意）"></textarea>
+    </div>
+    <div class="form-group">
+      <div class="photo-input-wrap">
+        <button class="btn btn-secondary btn-sm">写真を追加</button>
+        <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this)">
+      </div>
+      <div id="photo-preview-area" style="margin-top:8px;display:flex;flex-wrap:wrap"></div>
+    </div>
+  </div>
+  <button class="btn btn-primary" onclick="saveRecord()">記録を保存</button>
+  <div style="margin-top:20px">
+    <div class="card">
+      <div class="card-title">本日の記録 <span id="today-count" style="font-size:13px;color:var(--text-light)"></span></div>
+      <div id="today-records"></div>
+    </div>
+  </div>
+</div>
+
+<!-- カレンダーページ -->
+<div id="page-calendar" class="page">
+  <div class="card">
+    <div class="cal-streak" id="cal-streak"></div>
+  </div>
+  <div class="card">
+    <div class="cal-header">
+      <button onclick="changeCalMonth(-1)">&lt;</button>
+      <span id="cal-month-label"></span>
+      <button onclick="changeCalMonth(1)">&gt;</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+  <div class="cal-detail" id="cal-detail"></div>
+</div>
+
+<!-- 体組成ページ -->
+<div id="page-body" class="page">
+  <div class="card">
+    <div class="card-title">体組成を記録</div>
+    <div class="body-row">
+      <span class="body-label">体重</span>
+      <input type="number" id="body-weight" placeholder="kg" step="0.1">
+      <span style="font-size:14px;color:var(--text-light)">kg</span>
+    </div>
+    <div class="body-row">
+      <span class="body-label">体脂肪率</span>
+      <input type="number" id="body-fat" placeholder="%" step="0.1">
+      <span style="font-size:14px;color:var(--text-light)">%</span>
+    </div>
+    <button class="btn btn-primary" onclick="saveBody()" style="margin-top:12px">記録</button>
+  </div>
+  <div class="card">
+    <div class="card-title">体重推移</div>
+    <div class="chart-container"><canvas id="weight-chart"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title">体脂肪率推移</div>
+    <div class="chart-container"><canvas id="fat-chart"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title">最近の記録</div>
+    <div id="body-history"></div>
+  </div>
+</div>
+
+<!-- 履歴ページ -->
+<div id="page-history" class="page">
+  <div class="filter-row" id="history-filter"></div>
+  <div id="history-list"></div>
+</div>
+
+<!-- 統計ページ -->
+<div id="page-stats" class="page">
+  <div class="card">
+    <div class="card-title">今月のサマリー</div>
+    <div class="stat-grid">
+      <div><div class="stat-value" id="stat-days">0</div><div class="stat-label">トレーニング日数</div></div>
+      <div><div class="stat-value" id="stat-sets">0</div><div class="stat-label">総セット数</div></div>
+      <div><div class="stat-value" id="stat-volume">0</div><div class="stat-label">総ボリューム(kg)</div></div>
+      <div><div class="stat-value" id="stat-exercises">0</div><div class="stat-label">種目数</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">部位別ボリューム</div>
+    <div class="chart-container"><canvas id="part-chart"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title">週別トレーニング回数</div>
+    <div class="chart-container"><canvas id="weekly-chart"></canvas></div>
+  </div>
+</div>
+
+<!-- 設定ページ -->
+<div id="page-settings" class="page">
+  <div class="card">
+    <div class="card-title">部位カスタマイズ</div>
+    <div id="parts-list"></div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <input type="text" id="new-part-name" placeholder="新しい部位名">
+      <button class="btn btn-primary btn-sm" onclick="addPart()">追加</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">よく使う種目</div>
+    <div id="exercises-list"></div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <input type="text" id="new-exercise-name" placeholder="種目名">
+      <select id="new-exercise-part" style="width:120px"></select>
+      <button class="btn btn-primary btn-sm" onclick="addExercise()">追加</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">データ管理</div>
+    <div class="btn-group" style="flex-direction:column">
+      <button class="btn btn-secondary" onclick="exportData()">JSONエクスポート</button>
+      <label class="btn btn-secondary" style="position:relative">
+        JSONインポート
+        <input type="file" accept=".json" onchange="importData(this)" style="position:absolute;opacity:0;width:100%;height:100%">
+      </label>
+      <button class="btn btn-danger" onclick="clearAllData()">全データ削除</button>
+    </div>
+  </div>
+</div>
+
+<!-- タブバー -->
+<nav class="tab-bar">
+  <button class="active" onclick="switchPage('record')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+    記録
+  </button>
+  <button onclick="switchPage('calendar')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    カレンダー
+  </button>
+  <button onclick="switchPage('body')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    体組成
+  </button>
+  <button onclick="switchPage('history')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.18 2.18L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+    履歴
+  </button>
+  <button onclick="switchPage('stats')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+    統計
+  </button>
+  <button onclick="switchPage('settings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.32 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    設定
+  </button>
+</nav>
+
+<script>
+var DB_KEY = 'gym-tracker-v1';
+var COLORS = ['#e85d3a','#f0a03a','#e8607a','#f5d76e','#d44060','#c75b2f','#f28c5a','#e0456e','#d4943a','#b8453a'];
+var PAGE_LIST = ['record','calendar','body','history','stats','settings'];
+
+var state = loadState();
+var currentDate = new Date();
+var selectedPart = null;
+var currentPhotos = [];
+var setCount = 3;
+var calYear = new Date().getFullYear();
+var calMonth = new Date().getMonth();
+var calSelectedDate = null;
+
+function loadState() {
+  try {
+    var saved = localStorage.getItem(DB_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return {
+    parts: ['胸','背中','肩','腕','脚','腹'],
+    exercises: [
+      {name:'ベンチプレス',part:'胸'},{name:'ダンベルフライ',part:'胸'},{name:'インクラインプレス',part:'胸'},
+      {name:'デッドリフト',part:'背中'},{name:'ラットプルダウン',part:'背中'},{name:'ベントオーバーロウ',part:'背中'},
+      {name:'ショルダープレス',part:'肩'},{name:'サイドレイズ',part:'肩'},{name:'フロントレイズ',part:'肩'},
+      {name:'アームカール',part:'腕'},{name:'トライセプスエクステンション',part:'腕'},
+      {name:'スクワット',part:'脚'},{name:'レッグプレス',part:'脚'},{name:'レッグカール',part:'脚'},
+      {name:'クランチ',part:'腹'},{name:'プランク',part:'腹'},{name:'レッグレイズ',part:'腹'}
+    ],
+    records: [],
+    bodyRecords: []
+  };
+}
+
+function save() { localStorage.setItem(DB_KEY, JSON.stringify(state)); }
+
+function fmt(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function fmtDisplay(d) {
+  var w = ['日','月','火','水','木','金','土'];
+  return (d.getMonth()+1) + '/' + d.getDate() + '(' + w[d.getDay()] + ')';
+}
+
+function escHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// ページ切替
+function switchPage(name) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('page-' + name).classList.add('active');
+  var btns = document.querySelectorAll('.tab-bar button');
+  for (var i = 0; i < btns.length; i++) {
+    if (i === PAGE_LIST.indexOf(name)) {
+      btns[i].classList.add('active');
+    } else {
+      btns[i].classList.remove('active');
+    }
+  }
+  if (name === 'record') renderRecordPage();
+  if (name === 'calendar') renderCalendar();
+  if (name === 'body') renderBody();
+  if (name === 'history') renderHistory();
+  if (name === 'stats') renderStats();
+  if (name === 'settings') renderSettings();
+}
+
+// === 記録ページ ===
+function changeDate(dir) {
+  currentDate.setDate(currentDate.getDate() + dir);
+  renderRecordPage();
+}
+
+function renderRecordPage() {
+  document.getElementById('current-date').textContent = fmtDisplay(currentDate);
+  renderPartChips();
+  renderSets();
+  updateExerciseList();
+  renderTodayRecords();
+}
+
+function renderPartChips() {
+  var c = document.getElementById('part-chips');
+  c.innerHTML = state.parts.map(function(p) {
+    return '<div class="chip ' + (selectedPart === p ? 'active' : '') + '" onclick="selectPart(\'' + p + '\')">' + p + '</div>';
+  }).join('');
+}
+
+function selectPart(p) {
+  selectedPart = (selectedPart === p) ? null : p;
+  renderPartChips();
+  updateExerciseList();
+}
+
+function updateExerciseList() {
+  var dl = document.getElementById('exercise-list');
+  var filtered = selectedPart ? state.exercises.filter(function(e) { return e.part === selectedPart; }) : state.exercises;
+  dl.innerHTML = filtered.map(function(e) { return '<option value="' + e.name + '">'; }).join('');
+}
+
+function addSet() {
+  setCount++;
+  renderSets();
+}
+
+function renderSets() {
+  var c = document.getElementById('sets-container');
+  var html = '';
+  for (var i = 1; i <= setCount; i++) {
+    html += '<div class="set-row">' +
+      '<span class="set-label">' + i + 'セット</span>' +
+      '<input type="number" id="weight-' + i + '" placeholder="重量kg" step="0.5" inputmode="decimal">' +
+      '<input type="number" id="reps-' + i + '" placeholder="回数" inputmode="numeric">' +
+      '</div>';
+  }
+  c.innerHTML = html;
+}
+
+function handlePhoto(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    currentPhotos.push(e.target.result);
+    renderPhotoPreview();
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function renderPhotoPreview() {
+  var area = document.getElementById('photo-preview-area');
+  area.innerHTML = currentPhotos.map(function(p, i) {
+    return '<div style="position:relative;display:inline-block"><img src="' + p + '" class="photo-preview"><button onclick="removePhoto(' + i + ')" style="position:absolute;top:-6px;right:-2px;background:var(--danger);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer">×</button></div>';
+  }).join('');
+}
+
+function removePhoto(i) {
+  currentPhotos.splice(i, 1);
+  renderPhotoPreview();
+}
+
+function saveRecord() {
+  var name = document.getElementById('exercise-name').value.trim();
+  if (!name) { alert('種目名を入力してください'); return; }
+
+  var sets = [];
+  for (var i = 1; i <= setCount; i++) {
+    var w = parseFloat(document.getElementById('weight-' + i).value) || 0;
+    var r = parseInt(document.getElementById('reps-' + i).value) || 0;
+    if (w > 0 || r > 0) sets.push({ weight: w, reps: r });
+  }
+  if (sets.length === 0) { alert('少なくとも1セット入力してください'); return; }
+
+  var part = selectedPart || (state.exercises.find(function(e) { return e.name === name; }) || {}).part || '未分類';
+  var memo = document.getElementById('record-memo').value.trim();
+
+  state.records.push({
+    id: Date.now(),
+    date: fmt(currentDate),
+    exercise: name,
+    part: part,
+    sets: sets,
+    memo: memo,
+    photos: currentPhotos.slice(),
+    createdAt: new Date().toISOString()
+  });
+
+  if (!state.exercises.find(function(e) { return e.name === name; })) {
+    state.exercises.push({ name: name, part: part });
+  }
+
+  save();
+  resetForm();
+  renderTodayRecords();
+
+  var toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;padding:10px 24px;border-radius:10px;font-size:14px;font-weight:600;z-index:300;animation:fadeout 2s forwards';
+  toast.textContent = '記録を保存しました';
+  document.body.appendChild(toast);
+  setTimeout(function() { toast.remove(); }, 2000);
+}
+
+function resetForm() {
+  document.getElementById('exercise-name').value = '';
+  document.getElementById('record-memo').value = '';
+  currentPhotos = [];
+  renderPhotoPreview();
+  setCount = 3;
+  renderSets();
+  updateExerciseList();
+}
+
+function renderTodayRecords() {
+  var dateStr = fmt(currentDate);
+  var recs = state.records.filter(function(r) { return r.date === dateStr; });
+  var c = document.getElementById('today-records');
+  document.getElementById('today-count').textContent = recs.length > 0 ? recs.length + '種目' : '';
+
+  if (recs.length === 0) {
+    c.innerHTML = '<div class="empty">まだ記録がありません</div>';
+    return;
+  }
+
+  c.innerHTML = recs.map(function(r) {
+    var setsText = r.sets.map(function(s, i) { return (i+1) + 'set: ' + s.weight + 'kg × ' + s.reps + '回'; }).join(' / ');
+    var memoHtml = r.memo ? '<div class="record-memo">' + escHtml(r.memo) + '</div>' : '';
+    var photoHtml = (r.photos || []).map(function(p) { return '<img src="' + p + '" class="record-photo">'; }).join('');
+    return '<div class="record-item">' +
+      '<div style="display:flex;justify-content:space-between;align-items:start">' +
+      '<div><span class="tag tag-custom">' + r.part + '</span><span class="record-exercise">' + r.exercise + '</span></div>' +
+      '<button class="delete-btn" onclick="deleteRecord(' + r.id + ')">×</button></div>' +
+      '<div class="record-detail">' + setsText + '</div>' +
+      memoHtml + photoHtml + '</div>';
+  }).join('');
+}
+
+function deleteRecord(id) {
+  if (!confirm('この記録を削除しますか？')) return;
+  state.records = state.records.filter(function(r) { return r.id !== id; });
+  save();
+  renderTodayRecords();
+}
+
+// === カレンダーページ ===
+function changeCalMonth(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  calSelectedDate = null;
+  renderCalendar();
+}
+
+function renderCalendar() {
+  var PART_COLORS = {};
+  state.parts.forEach(function(p, i) { PART_COLORS[p] = COLORS[i % COLORS.length]; });
+
+  document.getElementById('cal-month-label').textContent = calYear + '年' + (calMonth + 1) + '月';
+
+  var trainDates = {};
+  state.records.forEach(function(r) {
+    if (!trainDates[r.date]) trainDates[r.date] = {};
+    trainDates[r.date][r.part] = true;
+  });
+
+  var firstDay = new Date(calYear, calMonth, 1).getDay();
+  var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  var prevDays = new Date(calYear, calMonth, 0).getDate();
+  var todayStr = fmt(new Date());
+
+  var dows = ['日','月','火','水','木','金','土'];
+  var html = '';
+  for (var di = 0; di < 7; di++) {
+    var dowColor = di === 0 ? 'color:#ef4444' : (di === 6 ? 'color:#f0a03a' : '');
+    html += '<div class="cal-dow" style="' + dowColor + '">' + dows[di] + '</div>';
+  }
+
+  for (var i = 0; i < firstDay; i++) {
+    var prevDay = prevDays - firstDay + 1 + i;
+    html += '<div class="cal-day other-month">' + prevDay + '</div>';
+  }
+
+  for (var day = 1; day <= daysInMonth; day++) {
+    var mm = String(calMonth + 1).padStart(2, '0');
+    var dd = String(day).padStart(2, '0');
+    var dateStr = calYear + '-' + mm + '-' + dd;
+    var isToday = dateStr === todayStr;
+    var isSelected = dateStr === calSelectedDate;
+    var partsForDay = trainDates[dateStr];
+    var dow = new Date(calYear, calMonth, day).getDay();
+
+    var dayClass = 'cal-day';
+    if (isToday) dayClass += ' today';
+    if (isSelected) dayClass += ' selected';
+
+    var dotsHtml = '<div class="cal-dots">';
+    if (partsForDay) {
+      var partKeys = Object.keys(partsForDay).slice(0, 4);
+      for (var pi = 0; pi < partKeys.length; pi++) {
+        var bgColor = PART_COLORS[partKeys[pi]] || '#94a3b8';
+        dotsHtml += '<span style="background:' + bgColor + '"></span>';
+      }
+    }
+    dotsHtml += '</div>';
+
+    var dayStyle = '';
+    if (!isSelected) {
+      if (dow === 0) dayStyle = 'color:#ef4444;';
+      else if (dow === 6) dayStyle = 'color:#f0a03a;';
+    }
+
+    html += '<div class="' + dayClass + '" style="' + dayStyle + '" onclick="selectCalDate(\'' + dateStr + '\')">' + day + dotsHtml + '</div>';
+  }
+
+  var totalCells = firstDay + daysInMonth;
+  var remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (var ri = 1; ri <= remaining; ri++) {
+    html += '<div class="cal-day other-month">' + ri + '</div>';
+  }
+
+  document.getElementById('cal-grid').innerHTML = html;
+  renderCalStreak();
+
+  if (calSelectedDate) {
+    renderCalDetail(calSelectedDate);
+  } else {
+    document.getElementById('cal-detail').innerHTML = '';
+  }
+}
+
+function selectCalDate(dateStr) {
+  calSelectedDate = (calSelectedDate === dateStr) ? null : dateStr;
+  renderCalendar();
+}
+
+function renderCalDetail(dateStr) {
+  var recs = state.records.filter(function(r) { return r.date === dateStr; });
+  var c = document.getElementById('cal-detail');
+  var d = new Date(dateStr + 'T00:00:00');
+  var wNames = ['日','月','火','水','木','金','土'];
+  var label = (d.getMonth()+1) + '/' + d.getDate() + '(' + wNames[d.getDay()] + ')';
+
+  if (recs.length === 0) {
+    c.innerHTML = '<div class="card">' +
+      '<div class="cal-detail-header">' + label + ' <button class="btn btn-primary btn-sm" onclick="goToRecord(\'' + dateStr + '\')">この日に記録</button></div>' +
+      '<div class="empty">記録なし</div></div>';
+    return;
+  }
+
+  var totalVol = 0, totalSets = 0;
+  recs.forEach(function(r) {
+    totalSets += r.sets.length;
+    r.sets.forEach(function(s) { totalVol += s.weight * s.reps; });
+  });
+
+  var recsHtml = recs.map(function(r) {
+    var setsText = r.sets.map(function(s, i) { return (i+1) + 'set: ' + s.weight + 'kg×' + s.reps + '回'; }).join(' / ');
+    var memoHtml = r.memo ? '<div class="record-memo">' + escHtml(r.memo) + '</div>' : '';
+    return '<div class="record-item">' +
+      '<span class="tag tag-custom">' + r.part + '</span>' +
+      '<span class="record-exercise">' + r.exercise + '</span>' +
+      '<div class="record-detail">' + setsText + '</div>' +
+      memoHtml + '</div>';
+  }).join('');
+
+  c.innerHTML = '<div class="card">' +
+    '<div class="cal-detail-header">' + label + '（' + recs.length + '種目・' + totalSets + 'セット・' + totalVol + 'kg）' +
+    '<button class="btn btn-primary btn-sm" onclick="goToRecord(\'' + dateStr + '\')">追加</button></div>' +
+    recsHtml + '</div>';
+}
+
+function goToRecord(dateStr) {
+  currentDate = new Date(dateStr + 'T00:00:00');
+  switchPage('record');
+}
+
+function renderCalStreak() {
+  var dateSet = {};
+  state.records.forEach(function(r) { dateSet[r.date] = true; });
+  var dates = Object.keys(dateSet).sort();
+  var todayStr = fmt(new Date());
+
+  var currentStreak = 0;
+  var d = new Date();
+  while (true) {
+    var ds = fmt(d);
+    if (dateSet[ds]) {
+      currentStreak++;
+      d.setDate(d.getDate() - 1);
+    } else if (ds === todayStr) {
+      d.setDate(d.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+
+  var maxStreak = 0, streak = 0;
+  for (var i = 0; i < dates.length; i++) {
+    if (i === 0) {
+      streak = 1;
+    } else {
+      var prev = new Date(dates[i-1] + 'T00:00:00');
+      var curr = new Date(dates[i] + 'T00:00:00');
+      var diff = (curr - prev) / 86400000;
+      streak = (diff === 1) ? streak + 1 : 1;
+    }
+    if (streak > maxStreak) maxStreak = streak;
+  }
+
+  var monthStr = calYear + '-' + String(calMonth+1).padStart(2,'0');
+  var monthDatesSet = {};
+  state.records.forEach(function(r) {
+    if (r.date.indexOf(monthStr) === 0) monthDatesSet[r.date] = true;
+  });
+  var monthDays = Object.keys(monthDatesSet).length;
+
+  document.getElementById('cal-streak').innerHTML =
+    '<div class="cal-streak-item"><div class="cal-streak-num">' + currentStreak + '</div><div class="cal-streak-label">連続日数</div></div>' +
+    '<div class="cal-streak-item"><div class="cal-streak-num">' + maxStreak + '</div><div class="cal-streak-label">最長連続</div></div>' +
+    '<div class="cal-streak-item"><div class="cal-streak-num">' + monthDays + '</div><div class="cal-streak-label">今月の日数</div></div>';
+}
+
+// === 体組成ページ ===
+function saveBody() {
+  var w = parseFloat(document.getElementById('body-weight').value);
+  var f = parseFloat(document.getElementById('body-fat').value);
+  if (!w && !f) { alert('体重または体脂肪率を入力してください'); return; }
+  state.bodyRecords.push({ id: Date.now(), date: fmt(new Date()), weight: w || null, fat: f || null });
+  save();
+  document.getElementById('body-weight').value = '';
+  document.getElementById('body-fat').value = '';
+  renderBody();
+}
+
+function renderBody() {
+  var recs = state.bodyRecords.slice(-30);
+  renderBodyHistory();
+  drawLineChart('weight-chart', recs.filter(function(r){return r.weight;}).map(function(r){return {label:r.date.slice(5),value:r.weight};}), 'kg');
+  drawLineChart('fat-chart', recs.filter(function(r){return r.fat;}).map(function(r){return {label:r.date.slice(5),value:r.fat};}), '%');
+}
+
+function renderBodyHistory() {
+  var c = document.getElementById('body-history');
+  var recs = state.bodyRecords.slice(-10).reverse();
+  if (recs.length === 0) { c.innerHTML = '<div class="empty">まだ記録がありません</div>'; return; }
+  c.innerHTML = recs.map(function(r) {
+    return '<div class="record-item" style="display:flex;justify-content:space-between;align-items:center">' +
+      '<div><div class="record-date">' + r.date + '</div><div>' + (r.weight ? r.weight + 'kg' : '-') + ' / ' + (r.fat ? r.fat + '%' : '-') + '</div></div>' +
+      '<button class="delete-btn" onclick="deleteBodyRecord(' + r.id + ')">×</button></div>';
+  }).join('');
+}
+
+function deleteBodyRecord(id) {
+  if (!confirm('削除しますか？')) return;
+  state.bodyRecords = state.bodyRecords.filter(function(r) { return r.id !== id; });
+  save();
+  renderBody();
+}
+
+// === 履歴ページ ===
+function renderHistory() {
+  var filterC = document.getElementById('history-filter');
+  filterC.innerHTML = '<div class="chip active" onclick="filterHistory(null, this)">全て</div>' +
+    state.parts.map(function(p) { return '<div class="chip" onclick="filterHistory(\'' + p + '\', this)">' + p + '</div>'; }).join('');
+  showFilteredHistory(null);
+}
+
+function filterHistory(part, el) {
+  document.querySelectorAll('#history-filter .chip').forEach(function(c) { c.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  showFilteredHistory(part);
+}
+
+function showFilteredHistory(part) {
+  var recs = part ? state.records.filter(function(r) { return r.part === part; }) : state.records;
+  var grouped = {};
+  recs.forEach(function(r) { if (!grouped[r.date]) grouped[r.date] = []; grouped[r.date].push(r); });
+
+  var dates = Object.keys(grouped).sort().reverse();
+  var c = document.getElementById('history-list');
+
+  if (dates.length === 0) { c.innerHTML = '<div class="empty">記録がありません</div>'; return; }
+
+  c.innerHTML = dates.slice(0, 30).map(function(date) {
+    var items = grouped[date].map(function(r) {
+      var setsText = r.sets.map(function(s, i) { return (i+1) + 'set: ' + s.weight + 'kg×' + s.reps + '回'; }).join(' / ');
+      var memoHtml = r.memo ? '<div class="record-memo">' + escHtml(r.memo) + '</div>' : '';
+      return '<div class="record-item"><span class="tag tag-custom">' + r.part + '</span><span class="record-exercise">' + r.exercise + '</span>' +
+        '<div class="record-detail">' + setsText + '</div>' + memoHtml + '</div>';
+    }).join('');
+    return '<div class="card"><div class="card-title">' + date + '</div>' + items + '</div>';
+  }).join('');
+}
+
+// === 統計ページ ===
+function renderStats() {
+  var now = new Date();
+  var monthStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  var monthRecs = state.records.filter(function(r) { return r.date.indexOf(monthStr) === 0; });
+
+  var daySet = {};
+  monthRecs.forEach(function(r) { daySet[r.date] = true; });
+  var days = Object.keys(daySet).length;
+  var totalSets = 0, totalVol = 0;
+  var exerciseSet = {};
+  monthRecs.forEach(function(r) {
+    totalSets += r.sets.length;
+    r.sets.forEach(function(s) { totalVol += s.weight * s.reps; });
+    exerciseSet[r.exercise] = true;
+  });
+
+  document.getElementById('stat-days').textContent = days;
+  document.getElementById('stat-sets').textContent = totalSets;
+  document.getElementById('stat-volume').textContent = totalVol >= 1000 ? (totalVol/1000).toFixed(1)+'k' : totalVol;
+  document.getElementById('stat-exercises').textContent = Object.keys(exerciseSet).length;
+
+  var partVol = {};
+  monthRecs.forEach(function(r) {
+    var vol = 0;
+    r.sets.forEach(function(s) { vol += s.weight * s.reps; });
+    partVol[r.part] = (partVol[r.part] || 0) + vol;
+  });
+  drawBarChart('part-chart', Object.keys(partVol).map(function(k) { return {label: k, value: partVol[k]}; }));
+
+  var weeks = {};
+  state.records.slice(-100).forEach(function(r) {
+    var d = new Date(r.date + 'T00:00:00');
+    var ws = new Date(d);
+    ws.setDate(d.getDate() - d.getDay());
+    var key = fmt(ws);
+    weeks[key] = (weeks[key] || 0) + 1;
+  });
+  var weekKeys = Object.keys(weeks).sort().slice(-8);
+  drawBarChart('weekly-chart', weekKeys.map(function(k) { return {label: k.slice(5), value: weeks[k]}; }));
+}
+
+// === 設定ページ ===
+function renderSettings() {
+  var pl = document.getElementById('parts-list');
+  pl.innerHTML = state.parts.map(function(p, i) {
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">' +
+      '<span>' + p + '</span><button class="delete-btn" onclick="deletePart(' + i + ')">×</button></div>';
+  }).join('');
+
+  var el = document.getElementById('exercises-list');
+  el.innerHTML = state.exercises.map(function(e, i) {
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">' +
+      '<span><span class="tag tag-custom">' + e.part + '</span>' + e.name + '</span>' +
+      '<button class="delete-btn" onclick="deleteExercise(' + i + ')">×</button></div>';
+  }).join('');
+
+  var sel = document.getElementById('new-exercise-part');
+  sel.innerHTML = state.parts.map(function(p) { return '<option value="' + p + '">' + p + '</option>'; }).join('');
+}
+
+function addPart() {
+  var name = document.getElementById('new-part-name').value.trim();
+  if (!name) return;
+  if (state.parts.indexOf(name) >= 0) { alert('既に存在します'); return; }
+  state.parts.push(name);
+  save();
+  document.getElementById('new-part-name').value = '';
+  renderSettings();
+  renderPartChips();
+}
+
+function deletePart(i) {
+  if (!confirm('「' + state.parts[i] + '」を削除しますか？')) return;
+  state.parts.splice(i, 1);
+  save();
+  renderSettings();
+}
+
+function addExercise() {
+  var name = document.getElementById('new-exercise-name').value.trim();
+  var part = document.getElementById('new-exercise-part').value;
+  if (!name) return;
+  state.exercises.push({ name: name, part: part });
+  save();
+  document.getElementById('new-exercise-name').value = '';
+  renderSettings();
+}
+
+function deleteExercise(i) {
+  state.exercises.splice(i, 1);
+  save();
+  renderSettings();
+}
+
+// === チャート描画 ===
+function drawLineChart(canvasId, data, unit) {
+  var canvas = document.getElementById(canvasId);
+  var ctx = canvas.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
+  var rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  var W = rect.width, H = rect.height;
+  ctx.clearRect(0, 0, W, H);
+
+  if (data.length < 2) {
+    ctx.fillStyle = '#94a3b8'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('データが不足しています', W/2, H/2);
+    return;
+  }
+
+  var pad = { t: 10, r: 15, b: 30, l: 45 };
+  var cW = W - pad.l - pad.r, cH = H - pad.t - pad.b;
+  var vals = data.map(function(d){return d.value;});
+  var min = Math.min.apply(null, vals) * 0.98, max = Math.max.apply(null, vals) * 1.02;
+  var range = max - min || 1;
+
+  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+  for (var i = 0; i <= 4; i++) {
+    var y = pad.t + (cH / 4) * i;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+    ctx.fillStyle = '#94a3b8'; ctx.font = '11px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText((max - (range/4)*i).toFixed(1), pad.l - 5, y + 4);
+  }
+
+  ctx.beginPath(); ctx.strokeStyle = '#e85d3a'; ctx.lineWidth = 2;
+  data.forEach(function(d, i) {
+    var x = pad.l + (cW / (data.length - 1)) * i;
+    var y2 = pad.t + cH - ((d.value - min) / range) * cH;
+    if (i === 0) ctx.moveTo(x, y2); else ctx.lineTo(x, y2);
+  });
+  ctx.stroke();
+
+  data.forEach(function(d, i) {
+    var x = pad.l + (cW / (data.length - 1)) * i;
+    var y2 = pad.t + cH - ((d.value - min) / range) * cH;
+    ctx.beginPath(); ctx.arc(x, y2, 3, 0, Math.PI * 2); ctx.fillStyle = '#e85d3a'; ctx.fill();
+  });
+
+  ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+  var step = Math.max(1, Math.floor(data.length / 6));
+  data.forEach(function(d, i) {
+    if (i % step === 0 || i === data.length-1) {
+      ctx.fillText(d.label, pad.l + (cW / (data.length - 1)) * i, H - 8);
+    }
+  });
+}
+
+function drawBarChart(canvasId, data) {
+  var canvas = document.getElementById(canvasId);
+  var ctx = canvas.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
+  var rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  var W = rect.width, H = rect.height;
+  ctx.clearRect(0, 0, W, H);
+
+  if (data.length === 0) {
+    ctx.fillStyle = '#94a3b8'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('データがありません', W/2, H/2);
+    return;
+  }
+
+  var pad = { t: 10, r: 15, b: 35, l: 15 };
+  var cW = W - pad.l - pad.r, cH = H - pad.t - pad.b;
+  var maxVal = Math.max.apply(null, data.map(function(d){return d.value;})) * 1.1 || 1;
+  var barW = Math.min(40, (cW / data.length) * 0.6);
+  var gap = cW / data.length;
+
+  data.forEach(function(d, i) {
+    var x = pad.l + gap * i + (gap - barW) / 2;
+    var h = (d.value / maxVal) * cH;
+    var y = pad.t + cH - h;
+    var r = 4;
+
+    ctx.fillStyle = COLORS[i % COLORS.length];
+    ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.lineTo(x + barW - r, y);
+    ctx.quadraticCurveTo(x + barW, y, x + barW, y + r);
+    ctx.lineTo(x + barW, pad.t + cH); ctx.lineTo(x, pad.t + cH);
+    ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.fill();
+
+    ctx.fillStyle = '#1e293b'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(d.value >= 1000 ? (d.value/1000).toFixed(1)+'k' : Math.round(d.value), x + barW/2, y - 5);
+    ctx.fillStyle = '#64748b'; ctx.font = '10px sans-serif';
+    ctx.fillText(d.label, x + barW/2, H - 8);
+  });
+}
+
+// === データ管理 ===
+function exportData() {
+  var blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'gym-tracker-' + fmt(new Date()) + '.json';
+  a.click();
+}
+
+function importData(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    if (!confirm('現在のデータを上書きしますか？')) return;
+    try {
+      state = JSON.parse(e.target.result);
+      save();
+      location.reload();
+    } catch(err) { alert('無効なファイルです'); }
+  };
+  reader.readAsText(file);
+}
+
+function clearAllData() {
+  if (!confirm('全てのデータを削除しますか？この操作は取り消せません。')) return;
+  if (!confirm('本当に削除しますか？')) return;
+  localStorage.removeItem(DB_KEY);
+  location.reload();
+}
+
+// === 初期化 ===
+renderRecordPage();
+</script>
+</body>
+</html>

@@ -333,7 +333,7 @@ function loadState() {
   };
 }
 
-function save() { localStorage.setItem(DB_KEY, JSON.stringify(state)); }
+function save() { try { localStorage.setItem(DB_KEY, JSON.stringify(state)); } catch(e) { alert('保存容量の上限に達しました。古い写真付き記録を削除してください。'); } }
 
 function fmt(d) {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
@@ -571,8 +571,24 @@ function handlePhoto(input) {
   if (!file) return;
   var reader = new FileReader();
   reader.onload = function(e) {
-    currentPhotos.push(e.target.result);
-    renderPhotoPreview();
+    var img = new Image();
+    img.onload = function() {
+      var maxW = 800, maxH = 800;
+      var w = img.width, h = img.height;
+      if (w > maxW || h > maxH) {
+        var ratio = Math.min(maxW / w, maxH / h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+      var canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      var compressed = canvas.toDataURL('image/jpeg', 0.6);
+      currentPhotos.push(compressed);
+      renderPhotoPreview();
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
   input.value = '';

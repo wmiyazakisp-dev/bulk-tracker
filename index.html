@@ -8,53 +8,55 @@
 <title>Bulk Tracker</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--primary:#e85d3a;--primary-dark:#d14b2a;--accent:#f7a63b;--pink:#e8607a;--bg:#dfe8f0;--card:rgba(255,255,255,.85);--text:#2d2a3e;--text-light:#7a7590;--border:rgba(200,195,215,.4);--success:#e85d3a;--danger:#d44060;--warning:#f7a63b}
+:root{--primary:#e8ff00;--primary-dark:#c8dd00;--bg:#0a0a0a;--card:#151515;--card-border:#252525;--text:#f0f0f0;--text-light:#777;--border:#2a2a2a;--danger:#ff3b5c;--success:#e8ff00;--dot-color:rgba(255,255,255,.08)}
 html{overflow-x:hidden}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:100px;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
-body::before{content:'';position:fixed;top:-20%;left:50%;transform:translateX(-50%);width:100vw;height:70vh;background:radial-gradient(ellipse at center,#f5d76e 0%,#f0a03a 20%,#e8607a 45%,#d44060 60%,rgba(223,232,240,0) 75%);z-index:-1;pointer-events:none;opacity:.35}
-.header{background:linear-gradient(135deg,#e85d3a,#f0a03a,#f5d76e);color:#fff;padding:16px 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
-.header h1{font-size:18px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.12)}
-.header-btn{background:rgba(255,255,255,.25);border:none;color:#fff;padding:6px 12px;border-radius:8px;font-size:13px;cursor:pointer;backdrop-filter:blur(4px)}
-.tab-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.92);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:calc(env(safe-area-inset-bottom, 20px) + 4px);backdrop-filter:blur(12px)}
-.tab-bar button{flex:1;border:none;background:none;padding:10px 0 8px;font-size:10px;color:var(--text-light);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+body{font-family:'Helvetica Neue',Arial,'Hiragino Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:100px;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:radial-gradient(circle,var(--dot-color) 1px,transparent 1px);background-size:20px 20px;z-index:0;pointer-events:none}
+.header{background:var(--bg);border-bottom:1px solid var(--border);color:var(--primary);padding:16px 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:20px;font-weight:900;letter-spacing:2px;text-transform:uppercase}
+.header-btn{background:transparent;border:1.5px solid var(--primary);color:var(--primary);padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.5px}
+.tab-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,.95);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:calc(env(safe-area-inset-bottom, 20px) + 4px);backdrop-filter:blur(12px)}
+.tab-bar button{flex:1;border:none;background:none;padding:10px 0 8px;font-size:10px;font-weight:600;color:var(--text-light);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;letter-spacing:.5px;text-transform:uppercase}
 .tab-bar button.active{color:var(--primary)}
 .tab-bar button svg{width:22px;height:22px}
-.page{display:none;padding:16px}
+.page{display:none;padding:16px;position:relative;z-index:1}
 .page.active{display:block}
-.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(200,120,80,.08);backdrop-filter:blur(8px)}
-.card-title{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.card{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:16px;margin-bottom:12px}
+.card-title{font-size:14px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;text-transform:uppercase;letter-spacing:1px;color:var(--text)}
 .form-group{margin-bottom:14px}
-.form-group label{display:block;font-size:13px;font-weight:600;color:var(--text-light);margin-bottom:5px}
-input,select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;background:var(--bg);color:var(--text);-webkit-appearance:none;font-family:inherit}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(232,93,58,.15)}
+.form-group label{display:block;font-size:12px;font-weight:700;color:var(--text-light);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+input,select,textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:16px;background:#111;color:var(--text);-webkit-appearance:none;font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px rgba(232,255,0,.15)}
 textarea{resize:vertical;min-height:60px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 20px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;width:100%;font-family:inherit}
-.btn-primary{background:linear-gradient(135deg,#e85d3a,#f0a03a);color:#fff;box-shadow:0 2px 8px rgba(232,93,58,.25)}
-.btn-primary:active{background:linear-gradient(135deg,#d14b2a,#e09030)}
-.btn-secondary{background:var(--bg);color:var(--text);border:1.5px solid var(--border)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 20px;border:none;border-radius:8px;font-size:14px;font-weight:800;cursor:pointer;width:100%;font-family:inherit;text-transform:uppercase;letter-spacing:.5px}
+.btn-primary{background:var(--primary);color:#0a0a0a}
+.btn-primary:active{background:var(--primary-dark)}
+.btn-secondary{background:#1a1a1a;color:var(--text);border:1.5px solid var(--border)}
 .btn-danger{background:var(--danger);color:#fff}
-.btn-sm{padding:8px 14px;font-size:13px;width:auto}
+.btn-sm{padding:8px 14px;font-size:12px;width:auto}
 .btn-group{display:flex;gap:8px}
 .chip-group{display:flex;flex-wrap:wrap;gap:8px}
-.chip{padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;border:1.5px solid var(--border);background:var(--card);cursor:pointer;transition:.15s}
-.chip.active{background:linear-gradient(135deg,#e85d3a,#f0a03a);color:#fff;border-color:transparent;box-shadow:0 2px 6px rgba(232,93,58,.2)}
+.chip{padding:8px 14px;border-radius:20px;font-size:13px;font-weight:700;border:1.5px solid var(--border);background:#1a1a1a;color:var(--text-light);cursor:pointer;transition:.15s}
+.chip.active{border-color:transparent;box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .set-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
 .set-row input{flex:1}
-.set-label{font-size:13px;font-weight:600;color:var(--text-light);min-width:50px;text-align:center}
+.set-label{font-size:13px;font-weight:700;color:var(--text-light);min-width:50px;text-align:center}
 .record-item{padding:14px 0;border-bottom:1px solid var(--border)}
 .record-item:last-child{border-bottom:none}
-.record-date{font-size:13px;color:var(--text-light);margin-bottom:4px}
-.record-exercise{font-size:15px;font-weight:600}
+.record-date{font-size:12px;color:var(--text-light);margin-bottom:4px;font-weight:600}
+.record-exercise{font-size:15px;font-weight:700}
 .record-detail{font-size:13px;color:var(--text-light);margin-top:2px}
-.record-memo{font-size:13px;color:var(--text);margin-top:6px;padding:8px;background:var(--bg);border-radius:8px}
+.record-memo{font-size:13px;color:var(--text);margin-top:6px;padding:8px;background:#111;border-radius:8px;border:1px solid var(--border)}
 .record-photo{width:100%;max-width:200px;border-radius:8px;margin-top:8px}
-.stat-value{font-size:28px;font-weight:800;color:var(--primary)}
-.stat-label{font-size:12px;color:var(--text-light);margin-top:2px}
+.record-actions{display:flex;gap:4px}
+.record-actions button{background:none;border:none;font-size:16px;cursor:pointer;padding:4px 8px}
+.edit-btn{color:var(--primary)}
+.stat-value{font-size:28px;font-weight:900;color:var(--primary)}
+.stat-label{font-size:11px;color:var(--text-light);margin-top:2px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .empty{text-align:center;padding:40px 20px;color:var(--text-light);font-size:14px}
 .delete-btn{background:none;border:none;color:var(--danger);font-size:18px;cursor:pointer;padding:4px 8px}
-.tag{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;margin-right:4px}
-.tag-custom{background:rgba(232,93,58,.12);color:#d14b2a}
+.tag{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:800;margin-right:4px;text-transform:uppercase;letter-spacing:.5px}
 .photo-input-wrap{position:relative}
 .photo-input-wrap input[type=file]{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer}
 .photo-preview{width:60px;height:60px;border-radius:8px;object-fit:cover;margin-right:8px}
@@ -64,40 +66,44 @@ canvas{width:100%!important;height:100%!important}
 .filter-row::-webkit-scrollbar{display:none}
 .body-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
 .body-row input{flex:1}
-.body-row .body-label{font-size:13px;min-width:70px;color:var(--text-light);font-weight:600}
+.body-row .body-label{font-size:13px;min-width:70px;color:var(--text-light);font-weight:700}
 .date-nav{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px}
 .date-nav button{background:none;border:none;font-size:20px;color:var(--primary);cursor:pointer;padding:4px 10px}
-.date-nav span{font-size:15px;font-weight:600}
-/* カレンダー */
+.date-nav span{font-size:15px;font-weight:800;letter-spacing:1px}
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .cal-header button{background:none;border:none;font-size:20px;color:var(--primary);cursor:pointer;padding:4px 12px}
-.cal-header span{font-size:16px;font-weight:700}
+.cal-header span{font-size:16px;font-weight:800;letter-spacing:1px}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
-.cal-dow{font-size:11px;font-weight:600;color:var(--text-light);padding:6px 0}
-.cal-day{position:relative;padding:8px 0;border-radius:10px;font-size:14px;cursor:pointer;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:.15s}
-.cal-day:active{background:var(--bg)}
-.cal-day.today{font-weight:800;color:var(--primary)}
-.cal-day.selected{background:var(--primary);color:#fff;border-radius:10px}
-.cal-day.selected .cal-dots span{background:#fff}
-.cal-day.other-month{color:#cbd5e1}
+.cal-dow{font-size:11px;font-weight:700;color:var(--text-light);padding:6px 0;text-transform:uppercase}
+.cal-day{position:relative;padding:8px 0;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:.15s}
+.cal-day:active{background:#1a1a1a}
+.cal-day.today{font-weight:900;color:var(--primary)}
+.cal-day.selected{background:var(--primary);color:#0a0a0a;border-radius:8px}
+.cal-day.selected .cal-dots span{background:#0a0a0a}
+.cal-day.other-month{color:#333}
 .cal-dots{display:flex;gap:2px;justify-content:center;min-height:6px}
 .cal-dots span{width:5px;height:5px;border-radius:50%}
 .cal-detail{margin-top:16px}
-.cal-detail-header{font-size:14px;font-weight:700;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.cal-detail-header{font-size:14px;font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
 .cal-streak{display:flex;gap:16px;justify-content:center;padding:4px 0}
 .cal-streak-item{text-align:center}
-.cal-streak-num{font-size:22px;font-weight:800;color:var(--primary)}
-.cal-streak-label{font-size:11px;color:var(--text-light)}
-.suggestions{background:var(--card);border:1.5px solid var(--border);border-radius:10px;margin-top:4px;max-height:200px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.cal-streak-num{font-size:22px;font-weight:900;color:var(--primary)}
+.cal-streak-label{font-size:11px;color:var(--text-light);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.suggestions{background:var(--card);border:1.5px solid var(--border);border-radius:8px;margin-top:4px;max-height:200px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .suggestion-item{padding:11px 14px;font-size:14px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
 .suggestion-item:last-child{border-bottom:none}
-.suggestion-item:active{background:var(--bg)}
-.suggestion-item .sg-part{font-size:11px;color:var(--text-light)}
-.last-menu-item{padding:10px 12px;margin-bottom:6px;background:var(--bg);border-radius:10px;cursor:pointer;transition:.15s}
+.suggestion-item:active{background:#1a1a1a}
+.suggestion-item .sg-part{font-size:11px;color:var(--text-light);font-weight:600}
+.last-menu-item{padding:10px 12px;margin-bottom:6px;background:#111;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:.15s}
 .last-menu-item:active{transform:scale(.98);opacity:.8}
-.last-menu-item .lm-name{font-size:14px;font-weight:600}
+.last-menu-item .lm-name{font-size:14px;font-weight:700}
 .last-menu-item .lm-detail{font-size:12px;color:var(--text-light);margin-top:2px}
 .last-menu-item .lm-date{font-size:11px;color:var(--text-light);float:right}
+.edit-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.edit-modal-content{background:var(--card);border:1px solid var(--card-border);border-radius:16px 16px 0 0;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;padding:20px;-webkit-overflow-scrolling:touch}
+.edit-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.edit-modal-header h3{font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+.edit-modal-close{background:none;border:none;color:var(--text-light);font-size:24px;cursor:pointer;padding:4px 8px}
 @keyframes fadeout{0%{opacity:1}70%{opacity:1}100%{opacity:0}}
 </style>
 </head>
@@ -105,10 +111,9 @@ canvas{width:100%!important;height:100%!important}
 
 <div class="header">
   <h1>Bulk Tracker</h1>
-  <button class="header-btn" onclick="exportData()">データ出力</button>
+  <button class="header-btn" onclick="exportData()">Export</button>
 </div>
 
-<!-- 記録ページ -->
 <div id="page-record" class="page active">
   <div class="date-nav">
     <button onclick="changeDate(-1)">&lt;</button>
@@ -116,46 +121,45 @@ canvas{width:100%!important;height:100%!important}
     <button onclick="changeDate(1)">&gt;</button>
   </div>
   <div class="card">
-    <div class="card-title">部位を選択</div>
+    <div class="card-title">Category</div>
     <div class="chip-group" id="part-chips"></div>
   </div>
   <div class="card" id="last-menu-card" style="display:none">
-    <div class="card-title">前回のメニュー <span id="last-menu-part" style="font-size:12px;color:var(--text-light)"></span></div>
+    <div class="card-title">Last Menu <span id="last-menu-part" style="font-size:12px;color:var(--text-light);font-weight:400"></span></div>
     <div id="last-menu-list"></div>
   </div>
 
   <div class="card">
-    <div class="card-title">種目</div>
+    <div class="card-title">Exercise</div>
     <div class="form-group" style="position:relative">
       <input type="text" id="exercise-name" placeholder="種目名を入力 or 下から選択" autocomplete="off" onfocus="showSuggestions()" oninput="showSuggestions()">
       <div id="exercise-suggestions" style="display:none"></div>
     </div>
     <div id="sets-container"></div>
-    <button class="btn btn-secondary btn-sm" id="add-set-btn" onclick="addSet()" style="margin-top:8px">+ セット追加</button>
+    <button class="btn btn-secondary btn-sm" id="add-set-btn" onclick="addSet()" style="margin-top:8px">+ Set</button>
   </div>
   <div class="card">
-    <div class="card-title">メモ・写真</div>
+    <div class="card-title">Memo / Photo</div>
     <div class="form-group">
       <textarea id="record-memo" placeholder="メモ（任意）"></textarea>
     </div>
     <div class="form-group">
       <div class="photo-input-wrap">
-        <button class="btn btn-secondary btn-sm">写真を追加</button>
+        <button class="btn btn-secondary btn-sm">+ Photo</button>
         <input type="file" accept="image/*" capture="environment" onchange="handlePhoto(this)">
       </div>
       <div id="photo-preview-area" style="margin-top:8px;display:flex;flex-wrap:wrap"></div>
     </div>
   </div>
-  <button class="btn btn-primary" onclick="saveRecord()">記録を保存</button>
+  <button class="btn btn-primary" id="save-record-btn" onclick="saveRecord()">Save Record</button>
   <div style="margin-top:20px">
     <div class="card">
-      <div class="card-title">本日の記録 <span id="today-count" style="font-size:13px;color:var(--text-light)"></span></div>
+      <div class="card-title">Today <span id="today-count" style="font-size:12px;color:var(--text-light);font-weight:400;text-transform:none;letter-spacing:0"></span></div>
       <div id="today-records"></div>
     </div>
   </div>
 </div>
 
-<!-- カレンダーページ -->
 <div id="page-calendar" class="page">
   <div class="card">
     <div class="cal-streak" id="cal-streak"></div>
@@ -171,136 +175,142 @@ canvas{width:100%!important;height:100%!important}
   <div class="cal-detail" id="cal-detail"></div>
 </div>
 
-<!-- 体組成ページ -->
 <div id="page-body" class="page">
   <div class="card">
-    <div class="card-title">体組成を記録</div>
+    <div class="card-title">Body Composition</div>
     <div class="body-row">
       <span class="body-label">体重</span>
       <input type="number" id="body-weight" placeholder="kg" step="0.1">
-      <span style="font-size:14px;color:var(--text-light)">kg</span>
+      <span style="font-size:14px;color:var(--text-light);min-width:20px">kg</span>
     </div>
     <div class="body-row">
       <span class="body-label">体脂肪率</span>
       <input type="number" id="body-fat" placeholder="%" step="0.1">
-      <span style="font-size:14px;color:var(--text-light)">%</span>
+      <span style="font-size:14px;color:var(--text-light);min-width:20px">%</span>
     </div>
-    <button class="btn btn-primary" onclick="saveBody()" style="margin-top:12px">記録</button>
+    <button class="btn btn-primary" onclick="saveBody()" style="margin-top:12px">Record</button>
   </div>
   <div class="card">
-    <div class="card-title">体重推移</div>
+    <div class="card-title">Weight</div>
     <div class="chart-container"><canvas id="weight-chart"></canvas></div>
   </div>
   <div class="card">
-    <div class="card-title">体脂肪率推移</div>
+    <div class="card-title">Body Fat %</div>
     <div class="chart-container"><canvas id="fat-chart"></canvas></div>
   </div>
   <div class="card">
-    <div class="card-title">最近の記録</div>
+    <div class="card-title">History</div>
     <div id="body-history"></div>
   </div>
 </div>
 
-<!-- 履歴ページ -->
 <div id="page-history" class="page">
   <div class="filter-row" id="history-filter"></div>
   <div id="history-list"></div>
 </div>
 
-<!-- 統計ページ -->
 <div id="page-stats" class="page">
   <div class="card">
-    <div class="card-title">今週のサマリー <span id="week-range" style="font-size:12px;color:var(--text-light);font-weight:400"></span></div>
+    <div class="card-title">Weekly <span id="week-range" style="font-size:11px;color:var(--text-light);font-weight:400;text-transform:none;letter-spacing:0"></span></div>
     <div class="stat-grid">
-      <div><div class="stat-value" id="week-days">0</div><div class="stat-label">トレーニング日数</div></div>
-      <div><div class="stat-value" id="week-sets">0</div><div class="stat-label">総セット数</div></div>
-      <div><div class="stat-value" id="week-volume">0</div><div class="stat-label">総ボリューム(kg)</div></div>
-      <div><div class="stat-value" id="week-cardio">0</div><div class="stat-label">有酸素(分)</div></div>
+      <div><div class="stat-value" id="week-days">0</div><div class="stat-label">Days</div></div>
+      <div><div class="stat-value" id="week-sets">0</div><div class="stat-label">Sets</div></div>
+      <div><div class="stat-value" id="week-volume">0</div><div class="stat-label">Volume(kg)</div></div>
+      <div><div class="stat-value" id="week-cardio">0</div><div class="stat-label">Cardio(min)</div></div>
     </div>
     <div id="week-parts" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px"></div>
   </div>
   <div class="card">
-    <div class="card-title">今月のサマリー</div>
+    <div class="card-title">Monthly</div>
     <div class="stat-grid">
-      <div><div class="stat-value" id="stat-days">0</div><div class="stat-label">トレーニング日数</div></div>
-      <div><div class="stat-value" id="stat-sets">0</div><div class="stat-label">総セット数</div></div>
-      <div><div class="stat-value" id="stat-volume">0</div><div class="stat-label">総ボリューム(kg)</div></div>
-      <div><div class="stat-value" id="stat-exercises">0</div><div class="stat-label">種目数</div></div>
+      <div><div class="stat-value" id="stat-days">0</div><div class="stat-label">Days</div></div>
+      <div><div class="stat-value" id="stat-sets">0</div><div class="stat-label">Sets</div></div>
+      <div><div class="stat-value" id="stat-volume">0</div><div class="stat-label">Volume(kg)</div></div>
+      <div><div class="stat-value" id="stat-exercises">0</div><div class="stat-label">Exercises</div></div>
     </div>
   </div>
   <div class="card">
-    <div class="card-title">部位別ボリューム</div>
+    <div class="card-title">Volume by Part</div>
     <div class="chart-container"><canvas id="part-chart"></canvas></div>
   </div>
   <div class="card">
-    <div class="card-title">週別トレーニング回数</div>
+    <div class="card-title">Weekly Sessions</div>
     <div class="chart-container"><canvas id="weekly-chart"></canvas></div>
   </div>
 </div>
 
-<!-- 設定ページ -->
 <div id="page-settings" class="page">
   <div class="card">
-    <div class="card-title">部位カスタマイズ</div>
+    <div class="card-title">Categories</div>
     <div id="parts-list"></div>
     <div style="display:flex;gap:8px;margin-top:12px">
       <input type="text" id="new-part-name" placeholder="新しい部位名">
-      <button class="btn btn-primary btn-sm" onclick="addPart()">追加</button>
+      <button class="btn btn-primary btn-sm" onclick="addPart()">Add</button>
     </div>
   </div>
   <div class="card">
-    <div class="card-title">よく使う種目</div>
+    <div class="card-title">Exercises</div>
     <div id="exercises-list"></div>
     <div style="display:flex;gap:8px;margin-top:12px">
       <input type="text" id="new-exercise-name" placeholder="種目名">
       <select id="new-exercise-part" style="width:120px"></select>
-      <button class="btn btn-primary btn-sm" onclick="addExercise()">追加</button>
+      <button class="btn btn-primary btn-sm" onclick="addExercise()">Add</button>
     </div>
   </div>
   <div class="card">
-    <div class="card-title">データ管理</div>
+    <div class="card-title">Data</div>
     <div class="btn-group" style="flex-direction:column">
-      <button class="btn btn-secondary" onclick="exportData()">JSONエクスポート</button>
+      <button class="btn btn-secondary" onclick="exportData()">JSON Export</button>
       <label class="btn btn-secondary" style="position:relative">
-        JSONインポート
+        JSON Import
         <input type="file" accept=".json" onchange="importData(this)" style="position:absolute;opacity:0;width:100%;height:100%">
       </label>
-      <button class="btn btn-danger" onclick="clearAllData()">全データ削除</button>
+      <button class="btn btn-danger" onclick="clearAllData()">Delete All</button>
     </div>
   </div>
 </div>
 
-<!-- タブバー -->
+<div id="edit-modal" class="edit-modal" style="display:none" onclick="if(event.target===this)closeEditModal()"></div>
+
 <nav class="tab-bar">
   <button class="active" onclick="switchPage('record')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-    記録
+    Record
   </button>
   <button onclick="switchPage('calendar')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-    カレンダー
+    Calendar
   </button>
   <button onclick="switchPage('body')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    体組成
+    Body
   </button>
   <button onclick="switchPage('history')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.18 2.18L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
-    履歴
+    History
   </button>
   <button onclick="switchPage('stats')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-    統計
+    Stats
   </button>
   <button onclick="switchPage('settings')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.32 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-    設定
+    Settings
   </button>
 </nav>
 
 <script>
 var DB_KEY = 'gym-tracker-v1';
-var COLORS = ['#e85d3a','#f0a03a','#e8607a','#f5d76e','#d44060','#c75b2f','#f28c5a','#e0456e','#d4943a','#b8453a'];
+var PART_COLOR_MAP = {
+  '胸': '#e8ff00',
+  '背中': '#00e5ff',
+  '肩': '#ff6b35',
+  '腕': '#bf5af2',
+  '脚': '#30d158',
+  '腹': '#ff375f',
+  '有酸素': '#64d2ff'
+};
+var FALLBACK_COLORS = ['#ffd60a','#ff9f0a','#ff453a','#bf5af2','#30d158','#64d2ff','#5e5ce6','#ac8e68','#ff6482','#00c7be'];
 var PAGE_LIST = ['record','calendar','body','history','stats','settings'];
 
 var state = loadState();
@@ -311,6 +321,27 @@ var setCount = 3;
 var calYear = new Date().getFullYear();
 var calMonth = new Date().getMonth();
 var calSelectedDate = null;
+var editingRecordId = null;
+
+function getPartColor(part) {
+  if (PART_COLOR_MAP[part]) return PART_COLOR_MAP[part];
+  var idx = state.parts.indexOf(part);
+  if (idx < 0) idx = 0;
+  return FALLBACK_COLORS[idx % FALLBACK_COLORS.length];
+}
+
+function getPartBg(part) {
+  var c = getPartColor(part);
+  return c.replace('#', '');
+}
+
+function hexToRgba(hex, a) {
+  hex = hex.replace('#', '');
+  var r = parseInt(hex.substring(0,2), 16);
+  var g = parseInt(hex.substring(2,4), 16);
+  var b = parseInt(hex.substring(4,6), 16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+}
 
 function loadState() {
   try {
@@ -354,10 +385,9 @@ function formatSets(r) {
     if (s.weight) parts.push(s.weight + 'km');
     return parts.join(' / ') || '-';
   }
-  return r.sets.map(function(s, i) { return (i+1) + 'set: ' + s.weight + 'kg × ' + s.reps + '回'; }).join(' / ');
+  return r.sets.map(function(s, i) { return (i+1) + 'set: ' + s.weight + 'kg x ' + s.reps + '回'; }).join(' / ');
 }
 
-// ページ切替
 function switchPage(name) {
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   document.getElementById('page-' + name).classList.add('active');
@@ -394,7 +424,11 @@ function renderRecordPage() {
 function renderPartChips() {
   var c = document.getElementById('part-chips');
   c.innerHTML = state.parts.map(function(p) {
-    return '<div class="chip ' + (selectedPart === p ? 'active' : '') + '" onclick="selectPart(\'' + p + '\')">' + p + '</div>';
+    var color = getPartColor(p);
+    var style = selectedPart === p
+      ? 'background:' + color + ';color:#0a0a0a;border-color:' + color
+      : 'border-color:' + hexToRgba(color, 0.3) + ';color:' + color;
+    return '<div class="chip" style="' + style + '" onclick="selectPart(\'' + p + '\')">' + p + '</div>';
   }).join('');
 }
 
@@ -452,7 +486,6 @@ function applyLastMenu(exercise, setsJson) {
     document.getElementById('weight-' + (i+1)).value = sets[i].weight || '';
     document.getElementById('reps-' + (i+1)).value = sets[i].reps || '';
   }
-
   var el = document.getElementById('exercise-name');
   el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
@@ -476,8 +509,9 @@ function showSuggestions() {
   container.className = 'suggestions';
   container.style.display = '';
   container.innerHTML = filtered.map(function(e) {
+    var color = getPartColor(e.part);
     return '<div class="suggestion-item" onclick="pickExercise(\'' + e.name.replace(/'/g, "\\'") + '\')">' +
-      '<span>' + e.name + '</span><span class="sg-part">' + e.part + '</span></div>';
+      '<span>' + e.name + '</span><span class="sg-part" style="color:' + color + '">' + e.part + '</span></div>';
   }).join('');
 }
 
@@ -529,9 +563,9 @@ function addSet() {
   var c = document.getElementById('sets-container');
   c.insertAdjacentHTML('beforeend',
     '<div class="set-row">' +
-    '<span class="set-label">' + setCount + 'セット</span>' +
-    '<input type="number" id="weight-' + setCount + '" placeholder="重量kg" step="0.5" inputmode="decimal">' +
-    '<input type="number" id="reps-' + setCount + '" placeholder="回数" inputmode="numeric">' +
+    '<span class="set-label">' + setCount + 'set</span>' +
+    '<input type="number" id="weight-' + setCount + '" placeholder="kg" step="0.5" inputmode="decimal">' +
+    '<input type="number" id="reps-' + setCount + '" placeholder="reps" inputmode="numeric">' +
     '</div>');
 }
 
@@ -541,12 +575,12 @@ function renderSets() {
 
   if (isCardio()) {
     c.innerHTML = '<div class="set-row">' +
-      '<span class="set-label">時間</span>' +
+      '<span class="set-label">Time</span>' +
       '<input type="number" id="cardio-min" placeholder="分" step="1" inputmode="numeric">' +
-      '<span style="font-size:14px;color:var(--text-light);min-width:20px">分</span>' +
+      '<span style="font-size:14px;color:var(--text-light);min-width:20px">min</span>' +
       '</div>' +
       '<div class="set-row">' +
-      '<span class="set-label">距離</span>' +
+      '<span class="set-label">Dist</span>' +
       '<input type="number" id="cardio-km" placeholder="km" step="0.1" inputmode="decimal">' +
       '<span style="font-size:14px;color:var(--text-light);min-width:20px">km</span>' +
       '</div>';
@@ -558,9 +592,9 @@ function renderSets() {
   var html = '';
   for (var i = 1; i <= setCount; i++) {
     html += '<div class="set-row">' +
-      '<span class="set-label">' + i + 'セット</span>' +
-      '<input type="number" id="weight-' + i + '" placeholder="重量kg" step="0.5" inputmode="decimal">' +
-      '<input type="number" id="reps-' + i + '" placeholder="回数" inputmode="numeric">' +
+      '<span class="set-label">' + i + 'set</span>' +
+      '<input type="number" id="weight-' + i + '" placeholder="kg" step="0.5" inputmode="decimal">' +
+      '<input type="number" id="reps-' + i + '" placeholder="reps" inputmode="numeric">' +
       '</div>';
   }
   c.innerHTML = html;
@@ -597,7 +631,7 @@ function handlePhoto(input) {
 function renderPhotoPreview() {
   var area = document.getElementById('photo-preview-area');
   area.innerHTML = currentPhotos.map(function(p, i) {
-    return '<div style="position:relative;display:inline-block"><img src="' + p + '" class="photo-preview"><button onclick="removePhoto(' + i + ')" style="position:absolute;top:-6px;right:-2px;background:var(--danger);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer">×</button></div>';
+    return '<div style="position:relative;display:inline-block"><img src="' + p + '" class="photo-preview"><button onclick="removePhoto(' + i + ')" style="position:absolute;top:-6px;right:-2px;background:var(--danger);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer">x</button></div>';
   }).join('');
 }
 
@@ -648,8 +682,8 @@ function saveRecord() {
   renderTodayRecords();
 
   var toast = document.createElement('div');
-  toast.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;padding:10px 24px;border-radius:10px;font-size:14px;font-weight:600;z-index:300;animation:fadeout 2s forwards';
-  toast.textContent = '記録を保存しました';
+  toast.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--primary);color:#0a0a0a;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:800;z-index:300;animation:fadeout 2s forwards;letter-spacing:.5px';
+  toast.textContent = 'SAVED';
   document.body.appendChild(toast);
   setTimeout(function() { toast.remove(); }, 2000);
 }
@@ -677,12 +711,13 @@ function renderTodayRecords() {
 
   c.innerHTML = recs.map(function(r) {
     var setsText = formatSets(r);
+    var color = getPartColor(r.part);
     var memoHtml = r.memo ? '<div class="record-memo">' + escHtml(r.memo) + '</div>' : '';
     var photoHtml = (r.photos || []).map(function(p) { return '<img src="' + p + '" class="record-photo">'; }).join('');
     return '<div class="record-item">' +
       '<div style="display:flex;justify-content:space-between;align-items:start">' +
-      '<div><span class="tag tag-custom">' + r.part + '</span><span class="record-exercise">' + r.exercise + '</span></div>' +
-      '<button class="delete-btn" onclick="deleteRecord(' + r.id + ')">×</button></div>' +
+      '<div><span class="tag" style="background:' + hexToRgba(color, 0.15) + ';color:' + color + '">' + r.part + '</span><span class="record-exercise">' + r.exercise + '</span></div>' +
+      '<div class="record-actions"><button class="edit-btn" onclick="openEditModal(' + r.id + ')">&#9998;</button><button class="delete-btn" onclick="deleteRecord(' + r.id + ')">x</button></div></div>' +
       '<div class="record-detail">' + setsText + '</div>' +
       memoHtml + photoHtml + '</div>';
   }).join('');
@@ -695,6 +730,94 @@ function deleteRecord(id) {
   renderTodayRecords();
 }
 
+// === 編集モーダル ===
+function openEditModal(id) {
+  var rec = state.records.find(function(r) { return r.id === id; });
+  if (!rec) return;
+  editingRecordId = id;
+
+  var isCardioRec = rec.sets.length > 0 && rec.sets[0].unit === 'cardio';
+  var color = getPartColor(rec.part);
+
+  var setsHtml = '';
+  if (isCardioRec) {
+    var s = rec.sets[0];
+    setsHtml = '<div class="set-row"><span class="set-label">Time</span>' +
+      '<input type="number" id="edit-cardio-min" value="' + (s.reps || '') + '" step="1" inputmode="numeric">' +
+      '<span style="font-size:14px;color:var(--text-light)">min</span></div>' +
+      '<div class="set-row"><span class="set-label">Dist</span>' +
+      '<input type="number" id="edit-cardio-km" value="' + (s.weight || '') + '" step="0.1" inputmode="decimal">' +
+      '<span style="font-size:14px;color:var(--text-light)">km</span></div>';
+  } else {
+    for (var i = 0; i < rec.sets.length; i++) {
+      setsHtml += '<div class="set-row"><span class="set-label">' + (i+1) + 'set</span>' +
+        '<input type="number" class="edit-weight" value="' + (rec.sets[i].weight || '') + '" step="0.5" inputmode="decimal" placeholder="kg">' +
+        '<input type="number" class="edit-reps" value="' + (rec.sets[i].reps || '') + '" inputmode="numeric" placeholder="reps">' +
+        '</div>';
+    }
+  }
+
+  var modal = document.getElementById('edit-modal');
+  modal.style.display = 'flex';
+  modal.innerHTML = '<div class="edit-modal-content">' +
+    '<div class="edit-modal-header"><h3>Edit Record</h3><button class="edit-modal-close" onclick="closeEditModal()">x</button></div>' +
+    '<div class="form-group"><label>Exercise</label><input type="text" id="edit-exercise" value="' + escHtml(rec.exercise) + '"></div>' +
+    '<div style="margin-bottom:12px"><span class="tag" style="background:' + hexToRgba(color, 0.15) + ';color:' + color + '">' + rec.part + '</span></div>' +
+    '<div id="edit-sets">' + setsHtml + '</div>' +
+    (isCardioRec ? '' : '<button class="btn btn-secondary btn-sm" onclick="addEditSet()" style="margin-bottom:12px">+ Set</button>') +
+    '<div class="form-group"><label>Memo</label><textarea id="edit-memo">' + escHtml(rec.memo || '') + '</textarea></div>' +
+    '<button class="btn btn-primary" onclick="saveEditRecord()">Update</button>' +
+    '</div>';
+}
+
+function addEditSet() {
+  var container = document.getElementById('edit-sets');
+  var count = container.querySelectorAll('.set-row').length + 1;
+  container.insertAdjacentHTML('beforeend',
+    '<div class="set-row"><span class="set-label">' + count + 'set</span>' +
+    '<input type="number" class="edit-weight" placeholder="kg" step="0.5" inputmode="decimal">' +
+    '<input type="number" class="edit-reps" placeholder="reps" inputmode="numeric">' +
+    '</div>');
+}
+
+function saveEditRecord() {
+  var rec = state.records.find(function(r) { return r.id === editingRecordId; });
+  if (!rec) return;
+
+  var name = document.getElementById('edit-exercise').value.trim();
+  if (!name) { alert('種目名を入力してください'); return; }
+  rec.exercise = name;
+  rec.memo = document.getElementById('edit-memo').value.trim();
+
+  var isCardioRec = rec.sets.length > 0 && rec.sets[0].unit === 'cardio';
+  if (isCardioRec) {
+    var mins = parseFloat(document.getElementById('edit-cardio-min').value) || 0;
+    var km = parseFloat(document.getElementById('edit-cardio-km').value) || 0;
+    rec.sets = [{ weight: km, reps: mins, unit: 'cardio' }];
+  } else {
+    var weights = document.querySelectorAll('.edit-weight');
+    var reps = document.querySelectorAll('.edit-reps');
+    var newSets = [];
+    for (var i = 0; i < weights.length; i++) {
+      var w = parseFloat(weights[i].value) || 0;
+      var r = parseInt(reps[i].value) || 0;
+      if (w > 0 || r > 0) newSets.push({ weight: w, reps: r });
+    }
+    if (newSets.length === 0) { alert('少なくとも1セット入力してください'); return; }
+    rec.sets = newSets;
+  }
+
+  save();
+  closeEditModal();
+  renderTodayRecords();
+  renderHistory();
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').style.display = 'none';
+  editingRecordId = null;
+}
+
 // === カレンダーページ ===
 function changeCalMonth(dir) {
   calMonth += dir;
@@ -705,9 +828,6 @@ function changeCalMonth(dir) {
 }
 
 function renderCalendar() {
-  var PART_COLORS = {};
-  state.parts.forEach(function(p, i) { PART_COLORS[p] = COLORS[i % COLORS.length]; });
-
   document.getElementById('cal-month-label').textContent = calYear + '年' + (calMonth + 1) + '月';
 
   var trainDates = {};
@@ -724,7 +844,7 @@ function renderCalendar() {
   var dows = ['日','月','火','水','木','金','土'];
   var html = '';
   for (var di = 0; di < 7; di++) {
-    var dowColor = di === 0 ? 'color:#ef4444' : (di === 6 ? 'color:#f0a03a' : '');
+    var dowColor = di === 0 ? 'color:#ff375f' : (di === 6 ? 'color:#64d2ff' : '');
     html += '<div class="cal-dow" style="' + dowColor + '">' + dows[di] + '</div>';
   }
 
@@ -750,7 +870,7 @@ function renderCalendar() {
     if (partsForDay) {
       var partKeys = Object.keys(partsForDay).slice(0, 4);
       for (var pi = 0; pi < partKeys.length; pi++) {
-        var bgColor = PART_COLORS[partKeys[pi]] || '#94a3b8';
+        var bgColor = getPartColor(partKeys[pi]);
         dotsHtml += '<span style="background:' + bgColor + '"></span>';
       }
     }
@@ -758,8 +878,8 @@ function renderCalendar() {
 
     var dayStyle = '';
     if (!isSelected) {
-      if (dow === 0) dayStyle = 'color:#ef4444;';
-      else if (dow === 6) dayStyle = 'color:#f0a03a;';
+      if (dow === 0) dayStyle = 'color:#ff375f;';
+      else if (dow === 6) dayStyle = 'color:#64d2ff;';
     }
 
     html += '<div class="' + dayClass + '" style="' + dayStyle + '" onclick="selectCalDate(\'' + dateStr + '\')">' + day + dotsHtml + '</div>';
@@ -795,7 +915,7 @@ function renderCalDetail(dateStr) {
 
   if (recs.length === 0) {
     c.innerHTML = '<div class="card">' +
-      '<div class="cal-detail-header">' + label + ' <button class="btn btn-primary btn-sm" onclick="goToRecord(\'' + dateStr + '\')">この日に記録</button></div>' +
+      '<div class="cal-detail-header">' + label + ' <button class="btn btn-primary btn-sm" onclick="goToRecord(\'' + dateStr + '\')">Record</button></div>' +
       '<div class="empty">記録なし</div></div>';
     return;
   }
@@ -808,17 +928,19 @@ function renderCalDetail(dateStr) {
 
   var recsHtml = recs.map(function(r) {
     var setsText = formatSets(r);
+    var color = getPartColor(r.part);
     var memoHtml = r.memo ? '<div class="record-memo">' + escHtml(r.memo) + '</div>' : '';
     return '<div class="record-item">' +
-      '<span class="tag tag-custom">' + r.part + '</span>' +
-      '<span class="record-exercise">' + r.exercise + '</span>' +
+      '<div style="display:flex;justify-content:space-between;align-items:start">' +
+      '<div><span class="tag" style="background:' + hexToRgba(color, 0.15) + ';color:' + color + '">' + r.part + '</span>' +
+      '<span class="record-exercise">' + r.exercise + '</span></div>' +
+      '<button class="edit-btn" onclick="openEditModal(' + r.id + ')">&#9998;</button></div>' +
       '<div class="record-detail">' + setsText + '</div>' +
       memoHtml + '</div>';
   }).join('');
 
   c.innerHTML = '<div class="card">' +
-    '<div class="cal-detail-header">' + label + '（' + recs.length + '種目・' + totalSets + 'セット・' + totalVol + 'kg）' +
-    '<button class="btn btn-primary btn-sm" onclick="goToRecord(\'' + dateStr + '\')">追加</button></div>' +
+    '<div class="cal-detail-header">' + label + '<button class="btn btn-primary btn-sm" onclick="goToRecord(\'' + dateStr + '\')">Add</button></div>' +
     recsHtml + '</div>';
 }
 
@@ -868,9 +990,9 @@ function renderCalStreak() {
   var monthDays = Object.keys(monthDatesSet).length;
 
   document.getElementById('cal-streak').innerHTML =
-    '<div class="cal-streak-item"><div class="cal-streak-num">' + currentStreak + '</div><div class="cal-streak-label">連続日数</div></div>' +
-    '<div class="cal-streak-item"><div class="cal-streak-num">' + maxStreak + '</div><div class="cal-streak-label">最長連続</div></div>' +
-    '<div class="cal-streak-item"><div class="cal-streak-num">' + monthDays + '</div><div class="cal-streak-label">今月の日数</div></div>';
+    '<div class="cal-streak-item"><div class="cal-streak-num">' + currentStreak + '</div><div class="cal-streak-label">Streak</div></div>' +
+    '<div class="cal-streak-item"><div class="cal-streak-num">' + maxStreak + '</div><div class="cal-streak-label">Best</div></div>' +
+    '<div class="cal-streak-item"><div class="cal-streak-num">' + monthDays + '</div><div class="cal-streak-label">Month</div></div>';
 }
 
 // === 体組成ページ ===
@@ -899,7 +1021,7 @@ function renderBodyHistory() {
   c.innerHTML = recs.map(function(r) {
     return '<div class="record-item" style="display:flex;justify-content:space-between;align-items:center">' +
       '<div><div class="record-date">' + r.date + '</div><div>' + (r.weight ? r.weight + 'kg' : '-') + ' / ' + (r.fat ? r.fat + '%' : '-') + '</div></div>' +
-      '<button class="delete-btn" onclick="deleteBodyRecord(' + r.id + ')">×</button></div>';
+      '<button class="delete-btn" onclick="deleteBodyRecord(' + r.id + ')">x</button></div>';
   }).join('');
 }
 
@@ -913,14 +1035,41 @@ function deleteBodyRecord(id) {
 // === 履歴ページ ===
 function renderHistory() {
   var filterC = document.getElementById('history-filter');
-  filterC.innerHTML = '<div class="chip active" onclick="filterHistory(null, this)">全て</div>' +
-    state.parts.map(function(p) { return '<div class="chip" onclick="filterHistory(\'' + p + '\', this)">' + p + '</div>'; }).join('');
+  filterC.innerHTML = '<div class="chip active" onclick="filterHistory(null, this)" style="border-color:var(--primary);color:var(--primary)">ALL</div>' +
+    state.parts.map(function(p) {
+      var color = getPartColor(p);
+      return '<div class="chip" onclick="filterHistory(\'' + p + '\', this)" style="border-color:' + hexToRgba(color, 0.3) + ';color:' + color + '">' + p + '</div>';
+    }).join('');
   showFilteredHistory(null);
 }
 
 function filterHistory(part, el) {
   document.querySelectorAll('#history-filter .chip').forEach(function(c) { c.classList.remove('active'); });
-  if (el) el.classList.add('active');
+  if (el) {
+    el.classList.add('active');
+    if (part) {
+      var color = getPartColor(part);
+      el.style.background = color;
+      el.style.color = '#0a0a0a';
+      el.style.borderColor = color;
+    } else {
+      el.style.background = 'var(--primary)';
+      el.style.color = '#0a0a0a';
+      el.style.borderColor = 'var(--primary)';
+    }
+  }
+  document.querySelectorAll('#history-filter .chip:not(.active)').forEach(function(c) {
+    c.style.background = '#1a1a1a';
+    var p = c.textContent;
+    if (p === 'ALL') {
+      c.style.color = 'var(--primary)';
+      c.style.borderColor = 'var(--primary)';
+    } else {
+      var col = getPartColor(p);
+      c.style.color = col;
+      c.style.borderColor = hexToRgba(col, 0.3);
+    }
+  });
   showFilteredHistory(part);
 }
 
@@ -937,8 +1086,13 @@ function showFilteredHistory(part) {
   c.innerHTML = dates.slice(0, 30).map(function(date) {
     var items = grouped[date].map(function(r) {
       var setsText = formatSets(r);
+      var color = getPartColor(r.part);
       var memoHtml = r.memo ? '<div class="record-memo">' + escHtml(r.memo) + '</div>' : '';
-      return '<div class="record-item"><span class="tag tag-custom">' + r.part + '</span><span class="record-exercise">' + r.exercise + '</span>' +
+      return '<div class="record-item">' +
+        '<div style="display:flex;justify-content:space-between;align-items:start">' +
+        '<div><span class="tag" style="background:' + hexToRgba(color, 0.15) + ';color:' + color + '">' + r.part + '</span>' +
+        '<span class="record-exercise">' + r.exercise + '</span></div>' +
+        '<button class="edit-btn" onclick="openEditModal(' + r.id + ')">&#9998;</button></div>' +
         '<div class="record-detail">' + setsText + '</div>' + memoHtml + '</div>';
     }).join('');
     return '<div class="card"><div class="card-title">' + date + '</div>' + items + '</div>';
@@ -986,7 +1140,6 @@ function renderStats() {
   var weekKeys = Object.keys(weeks).sort().slice(-8);
   drawBarChart('weekly-chart', weekKeys.map(function(k) { return {label: k.slice(5), value: weeks[k]}; }));
 
-  // 今週のサマリー
   var today = new Date();
   var dayOfWeek = today.getDay();
   var mon = new Date(today);
@@ -995,7 +1148,7 @@ function renderStats() {
   sun.setDate(mon.getDate() + 6);
   var monStr = fmt(mon);
   var sunStr = fmt(sun);
-  document.getElementById('week-range').textContent = monStr.slice(5) + ' 〜 ' + sunStr.slice(5);
+  document.getElementById('week-range').textContent = monStr.slice(5) + ' - ' + sunStr.slice(5);
 
   var weekRecs = state.records.filter(function(r) { return r.date >= monStr && r.date <= sunStr; });
   var wDays = {};
@@ -1019,7 +1172,8 @@ function renderStats() {
   document.getElementById('week-cardio').textContent = wCardio;
   var wpEl = document.getElementById('week-parts');
   wpEl.innerHTML = Object.keys(wParts).map(function(p) {
-    return '<span class="tag" style="background:var(--primary);color:#fff;font-size:11px">' + p + '</span>';
+    var color = getPartColor(p);
+    return '<span class="tag" style="background:' + hexToRgba(color, 0.15) + ';color:' + color + ';font-size:11px">' + p + '</span>';
   }).join('');
 }
 
@@ -1027,15 +1181,18 @@ function renderStats() {
 function renderSettings() {
   var pl = document.getElementById('parts-list');
   pl.innerHTML = state.parts.map(function(p, i) {
+    var color = getPartColor(p);
     return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">' +
-      '<span>' + p + '</span><button class="delete-btn" onclick="deletePart(' + i + ')">×</button></div>';
+      '<span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + color + ';margin-right:8px"></span>' + p + '</span>' +
+      '<button class="delete-btn" onclick="deletePart(' + i + ')">x</button></div>';
   }).join('');
 
   var el = document.getElementById('exercises-list');
   el.innerHTML = state.exercises.map(function(e, i) {
+    var color = getPartColor(e.part);
     return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">' +
-      '<span><span class="tag tag-custom">' + e.part + '</span>' + e.name + '</span>' +
-      '<button class="delete-btn" onclick="deleteExercise(' + i + ')">×</button></div>';
+      '<span><span class="tag" style="background:' + hexToRgba(color, 0.15) + ';color:' + color + '">' + e.part + '</span>' + e.name + '</span>' +
+      '<button class="delete-btn" onclick="deleteExercise(' + i + ')">x</button></div>';
   }).join('');
 
   var sel = document.getElementById('new-exercise-part');
@@ -1089,7 +1246,7 @@ function drawLineChart(canvasId, data, unit) {
   ctx.clearRect(0, 0, W, H);
 
   if (data.length < 2) {
-    ctx.fillStyle = '#94a3b8'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#555'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
     ctx.fillText('データが不足しています', W/2, H/2);
     return;
   }
@@ -1100,15 +1257,15 @@ function drawLineChart(canvasId, data, unit) {
   var min = Math.min.apply(null, vals) * 0.98, max = Math.max.apply(null, vals) * 1.02;
   var range = max - min || 1;
 
-  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+  ctx.strokeStyle = '#222'; ctx.lineWidth = 1;
   for (var i = 0; i <= 4; i++) {
     var y = pad.t + (cH / 4) * i;
     ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
-    ctx.fillStyle = '#94a3b8'; ctx.font = '11px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillStyle = '#555'; ctx.font = '11px sans-serif'; ctx.textAlign = 'right';
     ctx.fillText((max - (range/4)*i).toFixed(1), pad.l - 5, y + 4);
   }
 
-  ctx.beginPath(); ctx.strokeStyle = '#e85d3a'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.strokeStyle = '#e8ff00'; ctx.lineWidth = 2;
   data.forEach(function(d, i) {
     var x = pad.l + (cW / (data.length - 1)) * i;
     var y2 = pad.t + cH - ((d.value - min) / range) * cH;
@@ -1119,10 +1276,10 @@ function drawLineChart(canvasId, data, unit) {
   data.forEach(function(d, i) {
     var x = pad.l + (cW / (data.length - 1)) * i;
     var y2 = pad.t + cH - ((d.value - min) / range) * cH;
-    ctx.beginPath(); ctx.arc(x, y2, 3, 0, Math.PI * 2); ctx.fillStyle = '#e85d3a'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y2, 3, 0, Math.PI * 2); ctx.fillStyle = '#e8ff00'; ctx.fill();
   });
 
-  ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#555'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
   var step = Math.max(1, Math.floor(data.length / 6));
   data.forEach(function(d, i) {
     if (i % step === 0 || i === data.length-1) {
@@ -1143,7 +1300,7 @@ function drawBarChart(canvasId, data) {
   ctx.clearRect(0, 0, W, H);
 
   if (data.length === 0) {
-    ctx.fillStyle = '#94a3b8'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#555'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
     ctx.fillText('データがありません', W/2, H/2);
     return;
   }
@@ -1159,8 +1316,9 @@ function drawBarChart(canvasId, data) {
     var h = (d.value / maxVal) * cH;
     var y = pad.t + cH - h;
     var r = 4;
+    var barColor = getPartColor(d.label);
 
-    ctx.fillStyle = COLORS[i % COLORS.length];
+    ctx.fillStyle = barColor;
     ctx.beginPath();
     ctx.moveTo(x + r, y); ctx.lineTo(x + barW - r, y);
     ctx.quadraticCurveTo(x + barW, y, x + barW, y + r);
@@ -1168,9 +1326,9 @@ function drawBarChart(canvasId, data) {
     ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
     ctx.fill();
 
-    ctx.fillStyle = '#1e293b'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#f0f0f0'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
     ctx.fillText(d.value >= 1000 ? (d.value/1000).toFixed(1)+'k' : Math.round(d.value), x + barW/2, y - 5);
-    ctx.fillStyle = '#64748b'; ctx.font = '10px sans-serif';
+    ctx.fillStyle = '#777'; ctx.font = '10px sans-serif';
     ctx.fillText(d.label, x + barW/2, H - 8);
   });
 }
@@ -1180,7 +1338,7 @@ function exportData() {
   var blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'gym-tracker-' + fmt(new Date()) + '.json';
+  a.download = 'bulk-tracker-' + fmt(new Date()) + '.json';
   a.click();
 }
 
@@ -1206,7 +1364,7 @@ function clearAllData() {
   location.reload();
 }
 
-// === ヘルスケア連携（URLパラメータ受信） ===
+// === ヘルスケア連携 ===
 function checkHealthImport() {
   var params = new URLSearchParams(window.location.search);
   var weight = parseFloat(params.get('weight'));
@@ -1234,7 +1392,7 @@ function checkHealthImport() {
   if (fat) msg += ' 体脂肪率 ' + fat + '%';
 
   var toast = document.createElement('div');
-  toast.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--success);color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;z-index:300;animation:fadeout 3s forwards;max-width:90%;text-align:center';
+  toast.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--primary);color:#0a0a0a;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:800;z-index:300;animation:fadeout 3s forwards;max-width:90%;text-align:center';
   toast.textContent = msg;
   document.body.appendChild(toast);
   setTimeout(function() { toast.remove(); }, 3000);
